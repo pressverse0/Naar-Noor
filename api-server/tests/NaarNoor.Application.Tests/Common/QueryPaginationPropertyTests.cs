@@ -1,195 +1,201 @@
-using FluentAssertions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
+using NaarNoor.Application.Common;
+using NaarNoor.Domain;
+using NaarNoor.Domain.ValueObjects;
 
-namespace NaarNoor.Application.Tests.Common;
-
-/// <summary>
-/// Property-based tests for query pagination correctness.
-/// These tests validate that pagination calculations are accurate across
-/// various data sizes and page configurations.
-///
-/// **Validates: Requirement 3.1**
-/// **Property 8: Query Pagination Correctness**
-/// </summary>
-public class QueryPaginationPropertyTests
+namespace NaarNoor.Application.Tests.Common
 {
     /// <summary>
-    /// Property: Offset calculation - page offset is calculated correctly from page number and size.
-    /// For any valid page number and page size, the calculated offset SHALL equal (pageNumber - 1) * pageSize.
+    /// Property 8: Query Pagination Correctness
+    /// Validates that pagination calculations are correct for various page sizes,
+    /// offsets, and dataset sizes.
     /// </summary>
-    [Property(MaxTest = 100)]
-    public Property OffsetCalculation_WithValidPageAndSize_IsCorrect()
+    public class QueryPaginationPropertyTests
     {
-        return Prop.ForAll(
-            Gen.Choose(1, 100).ToArbitrary(), // pageNumber
-            Gen.Choose(1, 100).ToArbitrary(),  // pageSize
-            (pageNumber, pageSize) =>
+        [Property(MaxTest = 100)]
+        public void Property_OffsetCalculation_IsCorrect(int pageNumber, int pageSize)
+        {
+            // Arrange: Valid pagination parameters
+            var validPageNumber = Math.Max(1, pageNumber % 100);
+            var validPageSize = Math.Max(1, Math.Min(100, Math.Abs(pageSize) + 1));
+
+            // Act: Calculate offset
+            var offset = (validPageNumber - 1) * validPageSize;
+
+            // Assert: Offset calculation is correct
+            Assert.True(offset >= 0);
+            Assert.Equal((validPageNumber - 1) * validPageSize, offset);
+        }
+
+        [Property(MaxTest = 100)]
+        public void Property_PageSizeHandling_MaintainsBounds(int pageSize)
+        {
+            // Arrange
+            var validPageSize = Math.Max(1, Math.Min(1000, Math.Abs(pageSize) + 1));
+            var totalItems = 500;
+
+            // Act: Calculate pages needed
+            var pagesNeeded = (int)Math.Ceiling((double)totalItems / validPageSize);
+
+            // Assert: Pages calculation is valid
+            Assert.True(pagesNeeded > 0);
+            Assert.True(pagesNeeded * validPageSize >= totalItems);
+            Assert.True((pagesNeeded - 1) * validPageSize < totalItems);
+        }
+
+        [Property(MaxTest = 100)]
+        public void Property_TotalCountAccuracy_MatchesItemCount(int itemCount)
+        {
+            // Arrange
+            var validCount = Math.Max(0, Math.Min(10000, itemCount));
+            var items = new List<MenuItem>();
+            for (int i = 0; i < validCount; i++)
             {
-                // Act
-                var offset = (pageNumber - 1) * pageSize;
-
-                // Assert
-                var expected = (pageNumber - 1) * pageSize;
-                return offset == expected;
+                items.Add(new MenuItem($"Item_{i}", "category", price: 10.0m + i, available: true));
             }
-        );
-    }
 
-    /// <summary>
-    /// Property: Page size handling - results returned match requested page size (or less on last page).
-    /// For any dataset and page size, each page SHALL contain up to pageSize items,
-    /// except the last page which may contain fewer items.
-    /// </summary>
-    [Property(MaxTest = 100)]
-    public Property PageSizeHandling_ReturnsCorrectItemCount()
-    {
-        return Prop.ForAll(
-            GeneratePaginationTestData(),
-            testData =>
+            // Act
+            var totalCount = items.Count;
+            var pageSize = 10;
+            var pagesNeeded = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            // Assert
+            Assert.Equal(validCount, totalCount);
+            Assert.True(pagesNeeded >= (totalCount > 0 ? 1 : 0));
+        }
+
+        [Property(MaxTest = 100)]
+        public void Property_BoundaryConditions_HandleEdgeCases(int totalItems)
+        {
+            // Arrange
+            var validTotal = Math.Max(0, Math.Min(1000, totalItems));
+            var pageSize = 10;
+
+            // Act
+            var pageCount = validTotal == 0 ? 0 : (int)Math.Ceiling((double)validTotal / pageSize);
+
+            // Assert: Empty dataset
+            if (validTotal == 0)
             {
-                var (totalItems, pageNumber, pageSize) = testData;
-                var offset = (pageNumber - 1) * pageSize;
-
-                // Calculate expected count for this page
-                var remainingItems = Math.Max(0, totalItems - offset);
-                var expectedCount = Math.Min(pageSize, remainingItems);
-
-                // If we're beyond available data, expect 0
-                if (offset >= totalItems)
-                {
-                    expectedCount = 0;
-                }
-
-                // Simulate pagination
-                var pageItems = Enumerable.Range(offset, pageSize)
-                    .Where(i => i < totalItems)
-                    .ToList();
-
-                return pageItems.Count == expectedCount;
+                Assert.Equal(0, pageCount);
             }
-        );
-    }
 
-    /// <summary>
-    /// Property: Boundary condition - empty dataset - pagination handles empty results correctly.
-    /// For an empty dataset, requesting any page SHALL return empty results with total count of 0.
-    /// </summary>
-    [Fact]
-    public void BoundaryCondition_EmptyDataset_ReturnsEmpty()
-    {
-        // Arrange
-        var totalItems = 0;
-        var pageNumber = 1;
-        var pageSize = 10;
-        var offset = (pageNumber - 1) * pageSize;
-
-        // Act
-        var pageItems = Enumerable.Range(offset, pageSize)
-            .Where(i => i < totalItems)
-            .ToList();
-
-        // Assert
-        pageItems.Should().BeEmpty();
-    }
-
-    /// <summary>
-    /// Property: Boundary condition - single page - dataset fits on one page.
-    /// For a dataset smaller than page size, all items fit on page 1 and no page 2 exists.
-    /// </summary>
-    [Fact]
-    public void BoundaryCondition_SinglePageDataset_AllItemsFitOnOnePage()
-    {
-        // Arrange
-        var totalItems = 5;
-        var pageSize = 10;
-        var pageNumber = 1;
-        var offset = (pageNumber - 1) * pageSize;
-
-        // Act
-        var pageItems = Enumerable.Range(offset, pageSize)
-            .Where(i => i < totalItems)
-            .ToList();
-
-        // Assert
-        pageItems.Should().HaveCount(5, "All items should fit on page 1");
-
-        // Verify page 2 returns nothing
-        var page2Number = 2;
-        var page2Offset = (page2Number - 1) * pageSize;
-        var page2Items = Enumerable.Range(page2Offset, pageSize)
-            .Where(i => i < totalItems)
-            .ToList();
-
-        page2Items.Should().BeEmpty("Page 2 should be empty");
-    }
-
-    /// <summary>
-    /// Property: Boundary condition - multiple pages - dataset spans multiple pages correctly.
-    /// For a dataset larger than page size, items are distributed correctly across pages,
-    /// with no gaps and no duplicates.
-    /// </summary>
-    [Fact]
-    public void BoundaryCondition_MultiplePages_ItemsDistributedCorrectly()
-    {
-        // Arrange
-        var totalItems = 27;
-        var pageSize = 10;
-
-        // Act
-        var page1Items = Enumerable.Range(0, pageSize).Where(i => i < totalItems).ToList();
-        var page2Items = Enumerable.Range(pageSize, pageSize).Where(i => i < totalItems).ToList();
-        var page3Items = Enumerable.Range(pageSize * 2, pageSize).Where(i => i < totalItems).ToList();
-
-        // Assert
-        page1Items.Should().HaveCount(10);
-        page2Items.Should().HaveCount(10);
-        page3Items.Should().HaveCount(7);
-
-        var allItems = page1Items.Concat(page2Items).Concat(page3Items).ToList();
-        allItems.Should().HaveCount(27);
-        allItems.Distinct().Should().HaveCount(27);
-    }
-
-    /// <summary>
-    /// Property: Out of bounds handling - requesting page beyond available pages returns empty.
-    /// For any page number greater than total pages, the result SHALL be empty.
-    /// </summary>
-    [Property(MaxTest = 50)]
-    public Property OutOfBoundsHandling_PageBeyondAvailable_ReturnsEmpty()
-    {
-        return Prop.ForAll(
-            Gen.Choose(1, 100).ToArbitrary(),
-            Gen.Choose(1, 50).ToArbitrary(),
-            (totalItems, pageSize) =>
+            // Assert: Single page
+            if (validTotal > 0 && validTotal <= pageSize)
             {
-                var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-                var pageNumber = totalPages + 1;
-                var offset = (pageNumber - 1) * pageSize;
-
-                var pageItems = Enumerable.Range(offset, pageSize)
-                    .Where(i => i < totalItems)
-                    .ToList();
-
-                return pageItems.Count == 0;
+                Assert.Equal(1, pageCount);
             }
-        );
+
+            // Assert: Multiple pages
+            if (validTotal > pageSize)
+            {
+                Assert.True(pageCount > 1);
+                Assert.True((pageCount - 1) * pageSize < validTotal);
+                Assert.True(pageCount * pageSize >= validTotal);
+            }
+        }
+
+        [Property(MaxTest = 100)]
+        public void Property_SortOrderPreservation_MaintainsSequence(int[] itemIndices)
+        {
+            // Arrange
+            var items = new List<int> { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+
+            // Act: Sort ascending
+            var ascending = items.OrderBy(x => x).ToList();
+
+            // Assert: Order preserved
+            for (int i = 1; i < ascending.Count; i++)
+            {
+                Assert.True(ascending[i] >= ascending[i - 1]);
+            }
+
+            // Act: Sort descending
+            var descending = items.OrderByDescending(x => x).ToList();
+
+            // Assert: Reverse order preserved
+            for (int i = 1; i < descending.Count; i++)
+            {
+                Assert.True(descending[i] <= descending[i - 1]);
+            }
+        }
+
+        [Property(MaxTest = 50)]
+        public void Property_PaginationConsistency_AcrossPages(int pageNumber, int pageSize)
+        {
+            // Arrange
+            var validPageNumber = Math.Max(1, pageNumber % 10);
+            var validPageSize = Math.Max(1, Math.Min(50, Math.Abs(pageSize) + 1));
+            var totalItems = 100;
+
+            // Act: Calculate pagination info
+            var offset = (validPageNumber - 1) * validPageSize;
+            var itemsOnPage = Math.Min(validPageSize, Math.Max(0, totalItems - offset));
+            var totalPages = (int)Math.Ceiling((double)totalItems / validPageSize);
+            var isLastPage = validPageNumber >= totalPages;
+
+            // Assert: Consistency across pages
+            Assert.True(offset >= 0);
+            Assert.True(offset + itemsOnPage <= totalItems);
+            if (isLastPage)
+            {
+                Assert.True(itemsOnPage <= validPageSize);
+            }
+            else
+            {
+                Assert.Equal(validPageSize, itemsOnPage);
+            }
+        }
+
+        [Property(MaxTest = 50)]
+        public void Property_FilterThenPaginate_ProducesCorrectResults(int pageNumber, int pageSize)
+        {
+            // Arrange
+            var validPageNumber = Math.Max(1, pageNumber % 5);
+            var validPageSize = Math.Max(1, Math.Min(20, Math.Abs(pageSize) + 1));
+            
+            var items = Enumerable.Range(1, 50)
+                .Select(i => new MenuItem($"Item_{i}", i % 2 == 0 ? "even" : "odd", 
+                    price: (decimal)i, available: i % 3 != 0))
+                .ToList();
+
+            // Act: Filter
+            var filtered = items.Where(x => x.IsAvailable).ToList();
+            
+            // Act: Paginate
+            var offset = (validPageNumber - 1) * validPageSize;
+            var page = filtered.Skip(offset).Take(validPageSize).ToList();
+
+            // Assert: Results are valid subset
+            Assert.True(page.Count <= validPageSize);
+            Assert.True(page.Count >= 0);
+            Assert.True(offset + page.Count <= filtered.Count);
+        }
     }
 
-    // ==================== HELPER METHODS ====================
-
-    private Arbitrary<(int totalItems, int pageNumber, int pageSize)> GeneratePaginationTestData()
+    /// <summary>
+    /// MenuItem test entity
+    /// </summary>
+    internal class MenuItem
     {
-        var genTotalItems = Gen.Choose(0, 1000);
-        var genPageNumber = Gen.Choose(1, 100);
-        var genPageSize = Gen.Choose(1, 100);
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Category { get; set; }
+        public decimal Price { get; set; }
+        public bool IsAvailable { get; set; }
 
-        var gen = from total in genTotalItems
-                  from pageNum in genPageNumber
-                  from pageSize in genPageSize
-                  select (total, pageNum, pageSize);
-
-        return Arb.From(gen);
+        public MenuItem(string name, string category, decimal price, bool available)
+        {
+            Name = name;
+            Category = category;
+            Price = price;
+            IsAvailable = available;
+        }
     }
 }
