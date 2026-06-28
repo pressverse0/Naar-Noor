@@ -8,7 +8,7 @@ metadata:
     component: database
     version: v1
 spec:
-  serviceName: naar-noor-database
+  serviceName: naar-noor-database-headless
   replicas: 1
   selector:
     matchLabels:

@@ -35,17 +35,17 @@ spec:
         fsGroup: 101
       containers:
       - name: frontend
-        image: naar-noor:frontend
-        imagePullPolicy: IfNotPresent
+        # Full GHCR path — matches what 04-build-artifacts.yml pushes
+        # Update OWNER/REPO to match your GitHub repository path
+        image: ghcr.io/OWNER/REPO-frontend:main
+        imagePullPolicy: Always
         ports:
         - name: http
           containerPort: 80
           protocol: TCP
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: API_URL
-          value: "http://naar-noor-backend:8080/api"
+        # NOTE: NODE_ENV / API_URL env vars are intentionally omitted.
+        # Angular is compiled at build time — runtime pod env vars do not affect static JS bundles.
+        # Configure the API base URL via Angular build environments (src/environments/).
         resources:
           requests:
             cpu: 100m

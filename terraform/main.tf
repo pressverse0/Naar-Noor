@@ -18,8 +18,9 @@ resource "kubernetes_secret" "database" {
   }
 
   data = {
-    "sa-password"        = var.database_password
-    "connection-string"  = "Server=naar-noor-database;Database=db54355;User Id=sa;Password=${var.database_password};Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+    # Supabase PostgreSQL connection string — inject real values via TF_VAR_database_password
+    # and TF_VAR_supabase_host CI environment variables
+    "connection-string" = "Host=${var.supabase_host};Port=5432;Database=postgres;User Id=postgres;Password=${var.database_password};Ssl Mode=Require;"
   }
 
   type = "Opaque"
@@ -171,17 +172,6 @@ resource "kubernetes_manifest" "database_statefulset" {
   ]
 }
 
-resource "kubernetes_manifest" "services" {
-  manifest = yamldecode(file("${path.module}/../k8s/services.yaml"))
-  
-  computed_fields = [
-    "metadata.resourceVersion",
-    "metadata.uid",
-  ]
-
-  depends_on = [kubernetes_namespace.naar_noor]
-}
-
 resource "kubernetes_manifest" "ingress" {
   manifest = yamldecode(file("${path.module}/../k8s/ingress.yaml"))
   
@@ -193,13 +183,36 @@ resource "kubernetes_manifest" "ingress" {
   depends_on = [kubernetes_namespace.naar_noor]
 }
 
-resource "kubernetes_manifest" "hpa" {
-  manifest = yamldecode(file("${path.module}/../k8s/hpa.yaml"))
-  
-  computed_fields = [
-    "metadata.resourceVersion",
-    "metadata.uid",
-  ]
+# -----------------------------------------------------------------
+# Services (multi-document YAML — cannot use yamldecode + kubernetes_manifest)
+# kubectl apply is the only reliable way to handle multi-doc YAML files.
+# services.yaml contains 6 documents; hpa.yaml contains 2 documents.
+# yamldecode() silently drops all but the first document.
+# -----------------------------------------------------------------
+resource "null_resource" "apply_services" {
+  triggers = {
+    manifest_hash = filemd5("${path.module}/../k8s/services.yaml")
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl apply -f ${path.module}/../k8s/services.yaml --kubeconfig ${var.kubernetes_config_path}"
+  }
 
   depends_on = [kubernetes_namespace.naar_noor]
+}
+
+resource "null_resource" "apply_hpa" {
+  triggers = {
+    manifest_hash = filemd5("${path.module}/../k8s/hpa.yaml")
+  }
+
+  provisioner "local-exec" {
+    # HPAs depend on deployments existing first
+    command = "kubectl apply -f ${path.module}/../k8s/hpa.yaml --kubeconfig ${var.kubernetes_config_path}"
+  }
+
+  depends_on = [
+    kubernetes_manifest.frontend_deployment,
+    kubernetes_manifest.backend_deployment,
+  ]
 }

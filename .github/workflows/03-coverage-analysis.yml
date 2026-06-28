@@ -39,8 +39,19 @@ jobs:
 
       # ==================== Coverage Validation ====================
 
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: 'naar-noor/package-lock.json'
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: naar-noor
+
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 

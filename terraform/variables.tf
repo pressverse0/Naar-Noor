@@ -109,6 +109,12 @@ variable "tags" {
   }
 }
 
+variable "supabase_host" {
+  description = "Supabase PostgreSQL host (e.g. db.xxxx.supabase.co)"
+  type        = string
+  sensitive   = true
+}
+
 variable "kubernetes_config_path" {
   description = "Path to Kubernetes config file"
   type        = string

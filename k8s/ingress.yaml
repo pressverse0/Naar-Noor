@@ -6,14 +6,16 @@ metadata:
   labels:
     app: naar-noor
   annotations:
-    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/ingress.class is deprecated since K8s 1.18 - use spec.ingressClassName instead
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "20m"
-    nginx.ingress.kubernetes.io/rate-limit: "100"
+    # nginx.ingress.kubernetes.io/limit-rps controls requests per second per client IP
     nginx.ingress.kubernetes.io/limit-rps: "10"
 spec:
+  # Replaces deprecated kubernetes.io/ingress.class annotation
+  ingressClassName: nginx
   tls:
   - hosts:
     - naar-noor.example.com

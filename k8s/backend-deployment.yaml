@@ -36,8 +36,10 @@ spec:
         fsGroup: 1000
       containers:
       - name: backend
-        image: naar-noor:backend
-        imagePullPolicy: IfNotPresent
+        # Full GHCR path — matches what 04-build-artifacts.yml pushes
+        # Update OWNER/REPO to match your GitHub repository path
+        image: ghcr.io/OWNER/REPO-backend:main
+        imagePullPolicy: Always
         ports:
         - name: http
           containerPort: 80
@@ -47,10 +49,6 @@ spec:
           value: "Production"
         - name: ASPNETCORE_URLS
           value: "http://+:80"
-        - name: DatabaseHost
-          value: naar-noor-database
-        - name: DatabasePort
-          value: "1433"
         - name: ConnectionStrings__DefaultConnection
           valueFrom:
             secretKeyRef:
