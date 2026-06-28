@@ -21,6 +21,6 @@ export class ContactPageComponent implements OnInit {
   private readonly seo = inject(SeoService);
 
   ngOnInit(): void {
-    this.seo.setTitle('Contact');
+    this.seo.set({ title: 'Contact' });
   }
 }

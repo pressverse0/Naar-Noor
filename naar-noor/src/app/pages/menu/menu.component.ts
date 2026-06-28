@@ -199,7 +199,7 @@ export class MenuPageComponent implements OnInit {
   loading = true;
 
   ngOnInit(): void {
-    this.seo.setTitle('Menu');
+    this.seo.set({ title: 'Menu' });
     this.api.getMenu().subscribe({
       next: (items) => {
         this.allItems = items;
@@ -239,11 +239,11 @@ export class MenuPageComponent implements OnInit {
     }
 
     // Price Range
-    if (this.minPrice !== null && this.minPrice !== undefined && this.minPrice !== '') {
-      items = items.filter(i => i.price >= (this.minPrice as number));
+    if (this.minPrice !== null && this.minPrice !== undefined) {
+      items = items.filter(i => i.price >= this.minPrice);
     }
-    if (this.maxPrice !== null && this.maxPrice !== undefined && this.maxPrice !== '') {
-      items = items.filter(i => i.price <= (this.maxPrice as number));
+    if (this.maxPrice !== null && this.maxPrice !== undefined) {
+      items = items.filter(i => i.price <= this.maxPrice);
     }
 
     // Sort

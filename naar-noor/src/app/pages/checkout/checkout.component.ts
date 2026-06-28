@@ -26,7 +26,7 @@ export class CheckoutComponent implements OnInit {
   submitting = false;
 
   ngOnInit(): void {
-    this.seo.setTitle('Checkout');
+    this.seo.setCheckout();
     if (this.cart.isEmpty()) {
       this.router.navigate(['/']);
       return;

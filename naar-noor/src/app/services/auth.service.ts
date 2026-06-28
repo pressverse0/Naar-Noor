@@ -32,8 +32,8 @@ export class AuthService {
           const decoded = this.decodeJwt(res.access_token);
           const session: AuthSession = {
             accessToken: res.access_token,
-            userId: decoded?.sub ?? '',
-            email:  decoded?.email ?? email,
+            userId: decoded?.['sub'] ?? '',
+            email:  decoded?.['email'] ?? email,
           };
           this.saveSession(session);
           this._session.set(session);

@@ -99,7 +99,7 @@ export class RegisterComponent {
   loading = false;
 
   constructor() {
-    this.seo.setTitle('Register');
+    this.seo.set({ title: 'Register' });
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],

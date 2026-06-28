@@ -21,6 +21,6 @@ export class AboutPageComponent implements OnInit {
   private readonly seo = inject(SeoService);
 
   ngOnInit(): void {
-    this.seo.setTitle('About');
+    this.seo.set({ title: 'About' });
   }
 }

@@ -140,7 +140,7 @@ export class ReservationsPageComponent implements OnInit {
   confirmationId = '';
 
   ngOnInit(): void {
-    this.seo.setTitle('Reservations');
+    this.seo.set({ title: 'Reservations' });
     this.api.getChefs().subscribe({
       next: (data) => {
         this.chefs = data;

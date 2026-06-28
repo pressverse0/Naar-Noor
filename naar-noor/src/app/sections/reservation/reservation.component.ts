@@ -90,7 +90,7 @@ export class ReservationComponent {
       reservationDate: this.formatDate(this.reservation.date),
       reservationTime: this.reservation.time,
       partySize: this.parsePartySize(this.reservation.guests),
-      specialRequests: this.reservation.specialRequests.trim() || undefined
+      specialRequests: this.reservation.specialRequests?.trim() || undefined
     }).subscribe({
       next: () => {
         this.submitting = false;

@@ -81,7 +81,7 @@ export class LoginComponent {
   loading = false;
 
   constructor() {
-    this.seo.setTitle('Login');
+    this.seo.set({ title: 'Login' });
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]]
