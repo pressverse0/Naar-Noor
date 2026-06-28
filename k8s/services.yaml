@@ -1,0 +1,131 @@
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: naar-noor-frontend
+  namespace: naar-noor
+  labels:
+    app: naar-noor
+    component: frontend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: naar-noor
+    component: frontend
+  sessionAffinity: None
+
+---
+# Frontend Headless Service for StatefulSet-like features
+apiVersion: v1
+kind: Service
+metadata:
+  name: naar-noor-frontend-headless
+  namespace: naar-noor
+  labels:
+    app: naar-noor
+    component: frontend
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: naar-noor
+    component: frontend
+
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: naar-noor-backend
+  namespace: naar-noor
+  labels:
+    app: naar-noor
+    component: backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: naar-noor
+    component: backend
+  sessionAffinity: None
+
+---
+# Backend Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: naar-noor-backend-headless
+  namespace: naar-noor
+  labels:
+    app: naar-noor
+    component: backend
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 8080
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: naar-noor
+    component: backend
+
+---
+# Database Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: naar-noor-database
+  namespace: naar-noor
+  labels:
+    app: naar-noor
+    component: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 1433
+    targetPort: mssql
+    protocol: TCP
+    name: mssql
+  selector:
+    app: naar-noor
+    component: database
+  sessionAffinity: None
+
+---
+# Database Headless Service (for StatefulSet)
+apiVersion: v1
+kind: Service
+metadata:
+  name: naar-noor-database-headless
+  namespace: naar-noor
+  labels:
+    app: naar-noor
+    component: database
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 1433
+    targetPort: mssql
+    protocol: TCP
+    name: mssql
+  selector:
+    app: naar-noor
+    component: database

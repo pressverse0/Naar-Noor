@@ -1,61 +1,110 @@
 #!/usr/bin/env sh
-# Husky pre-commit hook - runs tests before allowing commits
+# Husky pre-commit hook - validates code quality for monorepo
+# Runs both backend and frontend tests before allowing commits
+# Projects: api-server (backend), naar-noor (frontend)
 
-echo "🧪 Running pre-commit tests..."
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "╔════════════════════════════════════════════════════════════════╗"
+echo "║         🧪 MONOREPO PRE-COMMIT VALIDATION                      ║"
+echo "║     Testing both backend and frontend before commit...         ║"
+echo "╚════════════════════════════════════════════════════════════════╝"
+echo ""
 
 EXIT_CODE=0
 
-# Backend tests
-if [ -d "api-server" ]; then
-  echo ""
-  echo "📦 Checking backend tests..."
-  if command -v dotnet &> /dev/null; then
+# Function to handle backend tests
+run_backend_tests() {
+  if [ ! -d "api-server" ]; then
+    echo "⚠️  Backend (api-server) directory not found - skipping"
+    return 0
+  fi
+
+  echo "📦 Backend Tests (C# / .NET)"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  if ! command -v dotnet &> /dev/null; then
+    echo "⚠️  dotnet not found - skipping backend tests"
+    echo "    Install .NET SDK to enable backend validation"
+    echo ""
+    return 0
+  fi
+
+  (
     cd api-server
     dotnet test --filter "Category=UnitTest" --no-build --verbosity quiet 2>/dev/null
-    if [ $? -ne 0 ]; then
-      echo "❌ Backend tests failed"
-      EXIT_CODE=1
-    else
-      echo "✅ Backend tests passed"
-    fi
-    cd ..
-  else
-    echo "⚠️  dotnet not found - skipping backend tests"
-  fi
-fi
+  )
 
-# Frontend tests
-if [ -d "naar-noor" ] && [ -f "naar-noor/package.json" ]; then
-  echo ""
-  echo "📱 Checking frontend tests..."
-  if command -v npm &> /dev/null; then
+  if [ $? -ne 0 ]; then
+    echo "❌ Backend tests FAILED"
+    echo ""
+    return 1
+  else
+    echo "✅ Backend tests PASSED"
+    echo ""
+    return 0
+  fi
+}
+
+# Function to handle frontend tests
+run_frontend_tests() {
+  if [ ! -d "naar-noor" ] || [ ! -f "naar-noor/package.json" ]; then
+    echo "⚠️  Frontend (naar-noor) directory not found - skipping"
+    return 0
+  fi
+
+  echo "📱 Frontend Tests (Angular)"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  if ! command -v npm &> /dev/null; then
+    echo "❌ npm not found - cannot run frontend tests"
+    echo "    Install Node.js and npm to enable frontend validation"
+    echo ""
+    return 1
+  fi
+
+  (
     cd naar-noor
     npm test -- --run 2>/dev/null
-    if [ $? -ne 0 ]; then
-      echo "❌ Frontend tests failed"
-      EXIT_CODE=1
-    else
-      echo "✅ Frontend tests passed"
-    fi
-    cd ..
+  )
+
+  if [ $? -ne 0 ]; then
+    echo "❌ Frontend tests FAILED"
+    echo ""
+    return 1
   else
-    echo "⚠️  npm not found - skipping frontend tests"
+    echo "✅ Frontend tests PASSED"
+    echo ""
+    return 0
   fi
+}
+
+# Run tests
+run_backend_tests
+if [ $? -ne 0 ]; then
+  EXIT_CODE=1
 fi
 
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+run_frontend_tests
+if [ $? -ne 0 ]; then
+  EXIT_CODE=1
+fi
+
+# Final status
+echo "╔════════════════════════════════════════════════════════════════╗"
 
 if [ $EXIT_CODE -eq 0 ]; then
-  echo "✅ All pre-commit tests passed - commit proceeding"
+  echo "║ ✅ ALL TESTS PASSED - Commit proceeding...                     ║"
+  echo "╚════════════════════════════════════════════════════════════════╝"
+  echo ""
   exit 0
 else
+  echo "║ ❌ TESTS FAILED - Commit blocked                               ║"
+  echo "╚════════════════════════════════════════════════════════════════╝"
   echo ""
-  echo "❌ Pre-commit tests failed - commit blocked"
+  echo "Fix the failing tests and try again."
   echo ""
-  echo "Fix the failing tests and try again, or run:"
-  echo "  git commit --no-verify  (not recommended)"
+  echo "To bypass this check (NOT RECOMMENDED):"
+  echo "  git commit --no-verify"
   echo ""
   exit 1
 fi

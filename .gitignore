@@ -1,49 +1,60 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Dependencies
+node_modules/
+.NET/
+packages/
 
-# compiled output
-dist
-tmp
-out-tsc
-*.tsbuildinfo
-.expo
-.expo-shared
+# Build outputs
+dist/
+bin/
+obj/
+publish/
 
-# dependencies
-node_modules
+# Test coverage
+coverage/
+test-results/
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-*
+.vs/
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# Environment files
+.env
+.env.local
+.env.*.local
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
+# Logs
+*.log
+logs/
 
-# System Files
+# OS
 .DS_Store
 Thumbs.db
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+# CI/CD
+.github/workflows/logs/
 
-# Replit
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Temporary
+.tmp/
 .cache/
-.local/
+*.tmp
+
+# Application specific
+api-server/tests/*/TestResults/
+naar-noor/coverage/
+naar-noor/cypress/screenshots/
+naar-noor/cypress/videos/
+
+# Sensitive files
+*.pem
+*.key
+secrets.json
+appsettings.*.json

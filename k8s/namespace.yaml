@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: naar-noor
+  labels:
+    app: naar-noor
+    managed-by: terraform

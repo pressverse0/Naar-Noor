@@ -1,0 +1,56 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: naar-noor-ingress
+  namespace: naar-noor
+  labels:
+    app: naar-noor
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+spec:
+  tls:
+  - hosts:
+    - naar-noor.example.com
+    - api.naar-noor.example.com
+    secretName: naar-noor-tls
+  rules:
+  - host: naar-noor.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: naar-noor-frontend
+            port:
+              number: 80
+  - host: api.naar-noor.example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: naar-noor-backend
+            port:
+              number: 8080
+      - path: /health
+        pathType: Exact
+        backend:
+          service:
+            name: naar-noor-backend
+            port:
+              number: 8080
+      - path: /swagger
+        pathType: Prefix
+        backend:
+          service:
+            name: naar-noor-backend
+            port:
+              number: 8080

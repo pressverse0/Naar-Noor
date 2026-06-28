@@ -1,3 +1,6 @@
+/// <reference types="cypress" />
+import { ReservationPage } from '../support/page-objects/ReservationPage';
+
 describe('Reservation Workflow E2E Tests', () => {
   beforeEach(() => {
     cy.visit('http://localhost:4200');

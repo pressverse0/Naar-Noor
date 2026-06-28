@@ -1,0 +1,107 @@
+# Development compose file with hot reload and additional tooling
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Naming: naar-noor-dev-{service}
+
+services:
+  naar-noor-dev-web:
+    build:
+      context: ./naar-noor
+      dockerfile: Dockerfile
+    container_name: naar-noor-dev-web
+    hostname: naar-noor-dev-web
+    volumes:
+      # Enable live reloading for development
+      - ./naar-noor/src:/app/src
+      - ./naar-noor/angular.json:/app/angular.json:ro
+      - ./naar-noor/tsconfig.app.json:/app/tsconfig.app.json:ro
+      - ./naar-noor/tailwind.config.js:/app/tailwind.config.js:ro
+      - ./naar-noor/karma.conf.js:/app/karma.conf.js:ro
+    environment:
+      - NODE_ENV=development
+      - API_URL=http://naar-noor-dev-api:80/api
+    ports:
+      - "80:80"
+      - "4200:4200"  # Angular dev server
+    command: npm run dev
+    labels:
+      com.naar-noor.service: "web"
+      com.naar-noor.environment: "development"
+      com.naar-noor.description: "Frontend web server (hot reload)"
+
+  naar-noor-dev-api:
+    build:
+      context: ./api-server
+      dockerfile: Dockerfile
+    container_name: naar-noor-dev-api
+    hostname: naar-noor-dev-api
+    volumes:
+      # Enable live reloading for development
+      - ./api-server/src:/app/src:ro
+      - ./api-server/tests:/app/tests:ro
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - DatabaseHost=naar-noor-dev-database
+      - DatabasePort=1433
+      - ConnectionStrings__DefaultConnection=Server=naar-noor-dev-database;Database=db54355;User Id=sa;Password=YourPassword123!;Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=True;
+    ports:
+      - "8080:80"
+      - "7000:7000"  # Debug port
+    command: dotnet watch run --project src/NaarNoor.API
+    labels:
+      com.naar-noor.service: "api"
+      com.naar-noor.environment: "development"
+      com.naar-noor.description: "Backend API server (hot reload)"
+
+  naar-noor-dev-database:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: naar-noor-dev-database
+    hostname: naar-noor-dev-database
+    environment:
+      - MSSQL_SA_PASSWORD=YourPassword123!
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    labels:
+      com.naar-noor.service: "database"
+      com.naar-noor.environment: "development"
+      com.naar-noor.description: "SQL Server database (development)"
+
+  # Adminer - Database management UI for development
+  naar-noor-dev-adminer:
+    image: adminer:latest
+    container_name: naar-noor-dev-adminer
+    hostname: naar-noor-dev-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      naar-noor-dev-database:
+        condition: service_healthy
+    networks:
+      - naar-noor-dev-network
+    restart: unless-stopped
+    environment:
+      - ADMINER_DEFAULT_SERVER=naar-noor-dev-database
+    labels:
+      com.naar-noor.service: "adminer"
+      com.naar-noor.environment: "development"
+      com.naar-noor.description: "Database management UI"
+
+networks:
+  naar-noor-dev-network:
+    name: naar-noor-dev-network
+    driver: bridge
+    labels:
+      com.naar-noor.network: "development"
+
+volumes:
+  naar-noor-dev-database-data:
+    driver: local
+    labels:
+      com.naar-noor.volume: "database-data"
+      com.naar-noor.environment: "development"
+  naar-noor-dev-database-log:
+    driver: local
+    labels:
+      com.naar-noor.volume: "database-log"
+      com.naar-noor.environment: "development"

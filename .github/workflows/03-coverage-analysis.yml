@@ -1,0 +1,251 @@
+name: Coverage Analysis
+
+# Depends on unit tests completing successfully
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # Collect and analyze coverage from all test jobs
+  coverage-gate:
+    name: Coverage - Gate & Analysis
+    runs-on: ubuntu-latest
+    needs: []  # Can run independently or after test workflows
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ==================== Collect Artifacts ====================
+
+      - name: Download backend unit test results
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-unit-test-results
+          path: ./backend-test-results
+        continue-on-error: true
+
+      - name: Download frontend unit test results
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-unit-test-results
+          path: ./frontend-test-results
+        continue-on-error: true
+
+      # ==================== Coverage Validation ====================
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Make validation scripts executable
+        run: |
+          chmod +x scripts/validate-coverage.py
+          chmod +x scripts/generate-coverage-report.py
+          chmod +x scripts/generate-coverage-badge.py
+          chmod +x scripts/generate-pr-comment.py
+        continue-on-error: true
+
+      - name: Validate backend coverage thresholds
+        id: backend-coverage
+        run: |
+          python scripts/validate-coverage.py \
+            --backend \
+            --backend-dir "api-server/tests" \
+            --output backend-report.json 2>&1 || true
+          
+          if [ -f backend-report.json ]; then
+            cat backend-report.json
+          else
+            echo "{\"passed\": false}" > backend-report.json
+          fi
+        continue-on-error: true
+
+      - name: Validate frontend coverage thresholds
+        id: frontend-coverage
+        run: |
+          cd naar-noor
+          npm run coverage:check 2>&1 || RESULT=$?
+          cd ..
+          
+          if [ "$RESULT" -eq 0 ]; then
+            echo "{\"passed\": true}" > frontend-report.json
+          else
+            echo "{\"passed\": false}" > frontend-report.json
+          fi
+        continue-on-error: true
+
+      # ==================== Generate Reports ====================
+
+      - name: Generate coverage comparison report
+        id: coverage-report
+        run: |
+          python scripts/generate-coverage-report.py \
+            --backend-report backend-report.json \
+            --frontend-report frontend-report.json \
+            --output coverage-summary.md 2>&1 || true
+          
+          if [ ! -f coverage-summary.md ]; then
+            echo "# Coverage Analysis\n\nReport pending..." > coverage-summary.md
+          fi
+        continue-on-error: true
+
+      - name: Generate coverage badges
+        id: badge-generation
+        run: |
+          mkdir -p ./coverage-badges
+          python scripts/generate-coverage-badge.py \
+            --backend-report backend-report.json \
+            --frontend-report frontend-report.json \
+            --output ./coverage-badges 2>&1 || true
+        continue-on-error: true
+
+      # ==================== Upload Artifacts ====================
+
+      - name: Upload coverage summary report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary-report
+          path: coverage-summary.md
+          retention-days: 30
+
+      - name: Upload coverage badges
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badges
+          path: ./coverage-badges/**/*
+          retention-days: 30
+          if-no-files-found: ignore
+
+      # ==================== Enforce Gates ====================
+
+      - name: Check coverage gates
+        id: gate-check
+        run: |
+          set +e
+          
+          BACKEND_PASS=$(python3 << 'EOF'
+          import json
+          try:
+            with open('backend-report.json') as f:
+              print('true' if json.load(f).get('passed') else 'false')
+          except:
+            print('false')
+          EOF
+          )
+          
+          FRONTEND_PASS=$(python3 << 'EOF'
+          import json
+          try:
+            with open('frontend-report.json') as f:
+              print('true' if json.load(f).get('passed') else 'false')
+          except:
+            print('false')
+          EOF
+          )
+          
+          echo "backend-pass=$BACKEND_PASS" >> $GITHUB_OUTPUT
+          echo "frontend-pass=$FRONTEND_PASS" >> $GITHUB_OUTPUT
+          
+          if [ "$BACKEND_PASS" = "true" ] && [ "$FRONTEND_PASS" = "true" ]; then
+            echo "gate-status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "gate-status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail if coverage gates did not pass
+        if: steps.gate-check.outputs.gate-status == 'failed'
+        run: |
+          echo "❌ Coverage gates failed"
+          echo ""
+          echo "Required Thresholds:"
+          echo "  Backend:"
+          echo "    - Domain: 85%"
+          echo "    - Application: 82%"
+          echo "    - Infrastructure: 78%"
+          echo "    - API: 80%"
+          echo "  Frontend:"
+          echo "    - Services: 80%"
+          echo "    - Components: 75%"
+          echo ""
+          if [ -f coverage-summary.md ]; then
+            echo "Summary:"
+            cat coverage-summary.md
+          fi
+          exit 1
+
+      # ==================== PR Comment ====================
+
+      - name: Generate PR comment
+        id: generate-pr-comment
+        if: github.event_name == 'pull_request'
+        run: |
+          python scripts/generate-pr-comment.py \
+            --backend-report backend-report.json \
+            --frontend-report frontend-report.json \
+            --backend-pass "${{ steps.gate-check.outputs.backend-pass }}" \
+            --frontend-pass "${{ steps.gate-check.outputs.frontend-pass }}" \
+            --output pr-comment.md 2>&1 || true
+          
+          if [ ! -f pr-comment.md ]; then
+            cat > pr-comment.md << 'COMMENT'
+          # 🧪 Coverage Analysis Report
+          
+          ## Status
+          - Backend: ⚙️ Processing
+          - Frontend: ⚙️ Processing
+          
+          See workflow logs for details.
+          COMMENT
+          fi
+        continue-on-error: true
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            try {
+              let comment = '# 🧪 Coverage Analysis Report\n\nProcessing...';
+              if (fs.existsSync('pr-comment.md')) {
+                comment = fs.readFileSync('pr-comment.md', 'utf8');
+              }
+              
+              const { data: comments } = await github.rest.issues.listComments({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              
+              const existingComment = comments.find(c =>
+                c.body.includes('Coverage Analysis') && c.user.type === 'Bot'
+              );
+              
+              if (existingComment) {
+                await github.rest.issues.updateComment({
+                  comment_id: existingComment.id,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: comment
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: comment
+                });
+              }
+            } catch(e) {
+              console.error('Error posting PR comment:', e.message);
+            }

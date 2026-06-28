@@ -1,0 +1,120 @@
+name: Integration Tests
+
+# Triggers on push and PR, but prioritizes integration test categories
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # Backend Integration Tests - Database and cross-layer tests
+  backend-integration-tests:
+    name: Backend - Integration Tests (.NET)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      # SQL Server for integration testing (if needed for local tests)
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          SA_PASSWORD: TestPassword123!
+          ACCEPT_EULA: Y
+        options: >-
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 1433:1433
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore api-server/NaarNoor.sln
+
+      - name: Build projects
+        run: dotnet build api-server/NaarNoor.sln --no-restore --configuration Release
+
+      # Run only integration tests (marked with Category=IntegrationTest)
+      - name: Run integration tests
+        run: |
+          dotnet test api-server/NaarNoor.sln \
+            --filter "Category=IntegrationTest" \
+            --no-build \
+            --configuration Release \
+            --logger:"console;verbosity=normal" \
+            --logger:"trx;LogFileName=integration-tests.trx" \
+            --results-directory:./test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-integration-test-results
+          path: test-results/**/*.trx
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # Frontend E2E Tests - Cypress end-to-end scenarios
+  frontend-e2e-tests:
+    name: Frontend - E2E Tests (Cypress)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: 'naar-noor/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: naar-noor
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: naar-noor
+
+      - name: Start frontend server
+        run: npm run dev &
+        working-directory: naar-noor
+
+      - name: Wait for frontend to be ready
+        run: npx wait-on http://localhost:4200 --timeout 60000
+        working-directory: naar-noor
+
+      - name: Run Cypress E2E tests
+        run: npx cypress run --headless --browser chrome
+        working-directory: naar-noor
+
+      - name: Upload Cypress screenshots (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: naar-noor/cypress/screenshots/**/*
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload Cypress videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: naar-noor/cypress/videos/**/*
+          retention-days: 30
+          if-no-files-found: ignore

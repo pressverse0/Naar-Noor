@@ -1,0 +1,84 @@
+name: Unit Tests
+
+# Triggers on every push and PR
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # Backend Unit Tests - Fast layer validation
+  backend-unit-tests:
+    name: Backend - Unit Tests (.NET)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore api-server/NaarNoor.sln
+
+      - name: Build projects
+        run: dotnet build api-server/NaarNoor.sln --no-restore --configuration Release
+
+      # Run only unit tests (marked with Category=UnitTest)
+      - name: Run unit tests
+        run: |
+          dotnet test api-server/NaarNoor.sln \
+            --filter "Category=UnitTest" \
+            --no-build \
+            --configuration Release \
+            --logger:"console;verbosity=normal" \
+            --logger:"trx;LogFileName=unit-tests.trx" \
+            --results-directory:./test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-unit-test-results
+          path: test-results/**/*.trx
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # Frontend Unit Tests - Angular/Jasmine
+  frontend-unit-tests:
+    name: Frontend - Unit Tests (Angular)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: 'naar-noor/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: naar-noor
+
+      - name: Run unit tests
+        run: npm run test:ci
+        working-directory: naar-noor
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-unit-test-results
+          path: naar-noor/coverage/**/*
+          retention-days: 30
+          if-no-files-found: ignore

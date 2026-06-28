@@ -1,0 +1,31 @@
+# Example Terraform variables
+# Copy to terraform.tfvars and fill in with your values
+
+project_name           = "naar-noor"
+environment            = "production"
+region                 = "us-east-1"
+kubernetes_version     = "1.27"
+
+frontend_replicas      = 3
+backend_replicas       = 3
+
+frontend_cpu_request   = "100m"
+frontend_memory_request = "128Mi"
+
+backend_cpu_request    = "200m"
+backend_memory_request = "256Mi"
+
+database_storage_size  = "10Gi"
+database_password      = "YourSecurePassword123!@"
+
+enable_monitoring      = true
+enable_logging         = true
+
+domain_name            = "naar-noor.example.com"
+
+tags = {
+  Application = "Naar-Noor"
+  Environment = "Production"
+  ManagedBy   = "Terraform"
+  Team        = "Platform"
+}

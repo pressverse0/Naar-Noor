@@ -1,0 +1,130 @@
+# Production compose file
+# Naming Convention: naar-noor-{environment}-{service}
+# Services: web (frontend), api (backend), database
+
+services:
+  # Frontend - Angular SPA served by Nginx
+  naar-noor-prod-web:
+    build:
+      context: ./naar-noor
+      dockerfile: Dockerfile
+    container_name: naar-noor-prod-web
+    hostname: naar-noor-prod-web
+    image: naar-noor:frontend
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://naar-noor-prod-api:80/api
+    depends_on:
+      naar-noor-prod-api:
+        condition: service_healthy
+    networks:
+      - naar-noor-prod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    labels:
+      com.naar-noor.service: "web"
+      com.naar-noor.environment: "production"
+      com.naar-noor.description: "Frontend web server (Nginx + Angular)"
+
+  # Backend - ASP.NET Core API
+  naar-noor-prod-api:
+    build:
+      context: ./api-server
+      dockerfile: Dockerfile
+    container_name: naar-noor-prod-api
+    hostname: naar-noor-prod-api
+    image: naar-noor:backend
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=naar-noor-prod-database;Database=db54355;User Id=sa;Password=YourPassword123!;Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=True;}
+      - DatabaseHost=naar-noor-prod-database
+      - DatabasePort=1433
+    depends_on:
+      naar-noor-prod-database:
+        condition: service_healthy
+    networks:
+      - naar-noor-prod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      com.naar-noor.service: "api"
+      com.naar-noor.environment: "production"
+      com.naar-noor.description: "Backend API server (.NET 8.0)"
+
+  # Database - SQL Server (local development/testing)
+  naar-noor-prod-database:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: naar-noor-prod-database
+    hostname: naar-noor-prod-database
+    ports:
+      - "1433:1433"
+    environment:
+      - MSSQL_SA_PASSWORD=${DB_SA_PASSWORD:-YourPassword123!}
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+      - MSSQL_DATA_DIR=/var/opt/mssql/data
+      - MSSQL_LOG_DIR=/var/opt/mssql/log
+      - MSSQL_BACKUP_DIR=/var/opt/mssql/backup
+    volumes:
+      - naar-noor-prod-database-data:/var/opt/mssql/data
+      - naar-noor-prod-database-log:/var/opt/mssql/log
+      - naar-noor-prod-database-backup:/var/opt/mssql/backup
+    networks:
+      - naar-noor-prod-network
+    restart: unless-stopped
+    healthcheck:
+      test: [
+        "CMD",
+        "/opt/mssql-tools/bin/sqlcmd",
+        "-S", "naar-noor-prod-database",
+        "-U", "sa",
+        "-P", "${DB_SA_PASSWORD:-YourPassword123!}",
+        "-Q", "SELECT 1"
+      ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      com.naar-noor.service: "database"
+      com.naar-noor.environment: "production"
+      com.naar-noor.description: "SQL Server database (2019)"
+
+networks:
+  naar-noor-prod-network:
+    name: naar-noor-prod-network
+    driver: bridge
+    labels:
+      com.naar-noor.network: "production"
+
+volumes:
+  naar-noor-prod-database-data:
+    driver: local
+    labels:
+      com.naar-noor.volume: "database-data"
+      com.naar-noor.environment: "production"
+  naar-noor-prod-database-log:
+    driver: local
+    labels:
+      com.naar-noor.volume: "database-log"
+      com.naar-noor.environment: "production"
+  naar-noor-prod-database-backup:
+    driver: local
+    labels:
+      com.naar-noor.volume: "database-backup"
+      com.naar-noor.environment: "production"
