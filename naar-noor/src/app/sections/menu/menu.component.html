@@ -10,7 +10,7 @@
     <!-- Category tabs -->
     <div *ngIf="!loading && !error" reveal [revealDelay]="80"
          class="flex flex-wrap items-center justify-center gap-2 mb-10 md:mb-12">
-      <button *ngFor="let cat of categories"
+      <button *ngFor="let cat of categories; trackBy: trackByCategory"
               (click)="setCategory(cat)"
               class="px-4 py-2 rounded-full text-xs font-medium tracking-wider uppercase transition-all duration-300"
               [ngClass]="activeCategory === cat
@@ -22,7 +22,7 @@
 
     <!-- Skeleton -->
     <div *ngIf="loading" class="space-y-8">
-      <div *ngFor="let i of [1,2,3,4,5]" class="animate-pulse">
+      <div *ngFor="let i of [1,2,3,4,5]; trackBy: trackByIndex" class="animate-pulse">
         <div class="flex items-baseline justify-between mb-2">
           <div class="h-5 bg-white/10 rounded w-48"></div>
           <div class="h-5 bg-white/10 rounded w-14"></div>
@@ -39,7 +39,7 @@
     <!-- Menu list — 2 columns on lg+ -->
     <div *ngIf="!loading && !error"
          class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
-      <div *ngFor="let item of filteredItems; let i = index"
+      <div *ngFor="let item of filteredItems; let i = index; trackBy: trackByItem"
            reveal
            [revealDelay]="(i % 10) * 40"
            revealFrom="bottom"

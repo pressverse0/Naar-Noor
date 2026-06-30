@@ -14,7 +14,7 @@
 
     <!-- Skeleton -->
     <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div *ngFor="let i of [1,2,3]" class="animate-pulse">
+      <div *ngFor="let i of [1,2,3]; trackBy: trackByIndex" class="animate-pulse">
         <div class="aspect-[3/4] rounded-2xl bg-white/5 mb-5"></div>
         <div class="h-6 bg-white/10 rounded w-36 mb-2"></div>
         <div class="h-3 bg-white/5 rounded w-20 mb-4"></div>
@@ -32,7 +32,7 @@
 
     <!-- Chefs grid -->
     <div *ngIf="!loading && !error" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-      <div *ngFor="let chef of chefs; let i = index"
+      <div *ngFor="let chef of chefs; let i = index; trackBy: trackByChef"
            reveal
            [revealDelay]="revealDelay(i)"
            revealFrom="bottom"

@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { RevealDirective } from '../../directives/scroll-reveal.directive';
@@ -16,10 +16,12 @@ const CHEF_IMAGES = [
   imports: [CommonModule, RevealDirective],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './chefs.component.html',
-  styleUrls: ['./chefs.component.css']
+  styleUrls: ['./chefs.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChefsComponent implements OnInit {
   private readonly api = inject(ApiService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   chefs: ChefView[] = [];
   loading = true;
@@ -37,15 +39,17 @@ export class ChefsComponent implements OnInit {
           initial: chef.name.charAt(0)
         }));
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.error = true;
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
 
-  revealDelay(i: number): number {
-    return i * 120;
-  }
+  revealDelay(i: number): number { return i * 120; }
+  trackByChef(_index: number, chef: ChefView): string { return chef.name; }
+  trackByIndex(_index: number): number { return _index; }
 }

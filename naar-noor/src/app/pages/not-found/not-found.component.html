@@ -11,7 +11,7 @@
 
   <!-- Ember particles -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-    <div *ngFor="let e of embers; let i = index"
+    <div *ngFor="let e of embers; let i = index; trackBy: trackByIndex"
          class="nf-ember"
          [style.left.%]="(i * 7.3 + 3) % 97"
          [style.width.px]="(i % 3) + 2"

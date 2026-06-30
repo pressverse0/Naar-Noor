@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -11,6 +11,7 @@ import { SeoService } from '../../services/seo.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="min-h-screen pt-28 pb-16 px-6 bg-[#0a0a0a]">
       <div class="max-w-7xl mx-auto">
@@ -49,7 +50,7 @@ import { SeoService } from '../../services/seo.service';
                 class="nn-input"
               >
                 <option value="All">All</option>
-                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                <option *ngFor="let cat of categories; trackBy: trackByString" [value]="cat">{{ cat }}</option>
               </select>
             </div>
 
@@ -140,7 +141,7 @@ import { SeoService } from '../../services/seo.service';
           <!-- Menu Items List -->
           <div class="lg:col-span-3">
             <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div *ngFor="let i of [1,2,3,4]" class="animate-pulse p-6 rounded-2xl bg-[#0d0d0d] border border-white/5 h-48"></div>
+              <div *ngFor="let i of [1,2,3,4]; trackBy: trackByIndex" class="animate-pulse p-6 rounded-2xl bg-[#0d0d0d] border border-white/5 h-48"></div>
             </div>
 
             <div *ngIf="!loading && filteredItems.length === 0" class="text-center py-16 text-neutral-500">
@@ -149,7 +150,7 @@ import { SeoService } from '../../services/seo.service';
 
             <div *ngIf="!loading && filteredItems.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div
-                *ngFor="let item of filteredItems"
+                *ngFor="let item of filteredItems; trackBy: trackByItem"
                 data-cy="menu-item"
                 class="p-6 rounded-2xl bg-[#0d0d0d] border border-white/5 flex flex-col justify-between hover:border-white/10 transition-all duration-300 group"
               >
@@ -188,9 +189,10 @@ import { SeoService } from '../../services/seo.service';
   `
 })
 export class MenuPageComponent implements OnInit {
-  private readonly api = inject(ApiService);
+  private readonly api  = inject(ApiService);
   private readonly cart = inject(CartService);
-  private readonly seo = inject(SeoService);
+  private readonly seo  = inject(SeoService);
+  private readonly cdr  = inject(ChangeDetectorRef);
 
   allItems: MenuItem[] = [];
   filteredItems: MenuItem[] = [];
@@ -224,9 +226,11 @@ export class MenuPageComponent implements OnInit {
         this.categories = [...new Set(items.map(i => i.category))];
         this.applyFilters();
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -278,6 +282,10 @@ export class MenuPageComponent implements OnInit {
 
     this.filteredItems = items;
   }
+
+  trackByItem(_index: number, item: MenuItem): string { return item.id; }
+  trackByString(_index: number, val: string): string { return val; }
+  trackByIndex(_index: number): number { return _index; }
 
   addToCart(item: MenuItem): void {
     this.cart.add({

@@ -1,4 +1,4 @@
-import { Component, Input, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RevealDirective } from '../../directives/scroll-reveal.directive';
 
@@ -8,10 +8,13 @@ import { RevealDirective } from '../../directives/scroll-reveal.directive';
   imports: [CommonModule, RevealDirective],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './about.component.html',
-  styleUrls: ['./about.component.css']
+  styleUrls: ['./about.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AboutComponent {
   @Input() standalone = false;
+
+  trackByIndex(_index: number): number { return _index; }
   features = [
     { icon: 'solar:flame-linear', title: 'Flame-Grilled', description: 'Specialties cooked over open flames for deep flavor.' },
     { icon: 'solar:leaf-linear', title: 'Fresh Ingredients', description: 'Locally sourced produce mixed with Himalayan herbs.' },

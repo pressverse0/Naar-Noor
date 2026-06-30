@@ -1,5 +1,5 @@
 import {
-  Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal, OnInit, OnDestroy
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal, OnInit, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -16,6 +16,7 @@ import { DrawerStep } from '../../models';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('backdrop', [
       transition(':enter', [style({ opacity: 0 }), animate('200ms ease', style({ opacity: 1 }))]),
@@ -105,7 +106,7 @@ import { DrawerStep } from '../../models';
 
           <!-- Items list -->
           <div *ngIf="!cart.isEmpty()" @stepIn class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
-            <div *ngFor="let item of cart.items()"
+            <div *ngFor="let item of cart.items(); trackBy: trackByCartItem"
                  class="flex items-start gap-4 p-4 bg-[#111] rounded-xl border border-white/5">
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-white leading-tight">{{ item.name }}</p>
@@ -165,7 +166,7 @@ import { DrawerStep } from '../../models';
             <div>
               <p class="text-xs text-neutral-500 tracking-[0.15em] uppercase mb-3">How would you like your order?</p>
               <div class="grid grid-cols-3 gap-2">
-                <label *ngFor="let t of orderTypes"
+                <label *ngFor="let t of orderTypes; trackBy: trackByType"
                        class="flex flex-col items-center gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-200"
                        [ngClass]="orderType === t.value
                          ? 'border-[#C65A1E] bg-[#C65A1E]/8 shadow-[0_0_12px_rgba(198,90,30,0.12)]'
@@ -311,7 +312,7 @@ import { DrawerStep } from '../../models';
             <!-- What happens next -->
             <div class="mt-8 w-full bg-[#111] border border-white/5 rounded-2xl p-5 text-left space-y-4">
               <h4 class="text-xs font-medium text-neutral-500 uppercase tracking-widest mb-1">What happens next</h4>
-              <div *ngFor="let s of nextSteps; let i = index" class="flex items-start gap-3">
+              <div *ngFor="let s of nextSteps; let i = index; trackBy: trackByIndex" class="flex items-start gap-3">
                 <div class="w-6 h-6 rounded-full bg-[#C65A1E]/10 border border-[#C65A1E]/20 flex items-center justify-center shrink-0 mt-0.5">
                   <span class="text-[10px] font-bold text-[#C65A1E]">{{ i + 1 }}</span>
                 </div>
@@ -338,10 +339,11 @@ import { DrawerStep } from '../../models';
   `
 })
 export class CartDrawerComponent implements OnInit, OnDestroy {
-  readonly cart    = inject(CartService);
+  readonly cart          = inject(CartService);
   private readonly fb    = inject(FormBuilder);
   private readonly api   = inject(ApiService);
   private readonly toast = inject(ToastService);
+  private readonly cdr   = inject(ChangeDetectorRef);
 
   step = signal<DrawerStep>(1);
   form!: FormGroup;
@@ -361,6 +363,10 @@ export class CartDrawerComponent implements OnInit, OnDestroy {
     { title: 'You get a call',        desc: "We'll ring the number you provided to confirm and arrange payment." },
     { title: 'Your food is prepared', desc: 'Freshly made with Himalayan care, ready for you.' }
   ];
+
+  trackByCartItem(_index: number, item: { menuItemId: string }): string { return item.menuItemId; }
+  trackByType(_index: number, t: { value: string }): string { return t.value; }
+  trackByIndex(_index: number): number { return _index; }
 
   ngOnInit(): void {
     this.buildForm();
@@ -452,6 +458,7 @@ export class CartDrawerComponent implements OnInit, OnDestroy {
         this.confirmedShortId = res.id ? res.id.split('-')[0].toUpperCase() : '';
         this.cart.clear();
         this.step.set(3);
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.submitting = false;
@@ -459,6 +466,7 @@ export class CartDrawerComponent implements OnInit, OnDestroy {
           ? Object.values(err.error.errors).flat().join('. ')
           : 'Something went wrong. Please try again.';
         this.toast.error(msg as string);
+        this.cdr.markForCheck();
       }
     });
   }

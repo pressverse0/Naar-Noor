@@ -36,7 +36,7 @@
         into extraordinary feasts.
       </p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-2">
-        <div *ngFor="let feature of features" class="flex items-start gap-4">
+        <div *ngFor="let feature of features; trackBy: trackByIndex" class="flex items-start gap-4">
           <div class="w-10 h-10 rounded-lg bg-[#111] border border-white/5 flex items-center justify-center shrink-0 text-[#C65A1E]">
             <iconify-icon [attr.icon]="feature.icon" width="22"></iconify-icon>
           </div>

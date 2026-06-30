@@ -13,7 +13,7 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-      <a *ngFor="let post of posts; let i = index"
+      <a *ngFor="let post of posts; let i = index; trackBy: trackByIndex"
          href="#"
          reveal
          [revealDelay]="i * 100"

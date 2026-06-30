@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -12,11 +12,13 @@ import { Review, ReviewView } from '../../models';
   imports: [CommonModule, ReactiveFormsModule, FormsModule, RevealDirective],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './reviews.component.html',
-  styleUrls: ['./reviews.component.css']
+  styleUrls: ['./reviews.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReviewsComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly fb = inject(FormBuilder);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   reviews: ReviewView[] = [];
   loading = true;
@@ -57,10 +59,12 @@ export class ReviewsComponent implements OnInit {
         }));
         this.updatePagination();
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.error = true;
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -130,7 +134,8 @@ export class ReviewsComponent implements OnInit {
     this.submitted = false;
   }
 
-  revealDelay(i: number): number {
-    return i * 100;
-  }
+  revealDelay(i: number): number { return i * 100; }
+  trackByReview(_index: number, r: ReviewView): string { return r.id; }
+  trackByStar(i: number): number { return i; }
+  trackByIndex(_index: number): number { return _index; }
 }

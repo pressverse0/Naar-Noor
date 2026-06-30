@@ -12,9 +12,9 @@
 
     <!-- Skeleton -->
     <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      <div *ngFor="let i of [1,2,3]" class="p-8 rounded-2xl bg-[#111] border border-white/5 animate-pulse">
+      <div *ngFor="let i of [1,2,3]; trackBy: trackByIndex" class="p-8 rounded-2xl bg-[#111] border border-white/5 animate-pulse">
         <div class="flex gap-1 mb-6">
-          <div *ngFor="let s of [1,2,3,4,5]" class="w-4 h-4 bg-white/10 rounded"></div>
+          <div *ngFor="let s of [1,2,3,4,5]; trackBy: trackByIndex" class="w-4 h-4 bg-white/10 rounded"></div>
         </div>
         <div class="space-y-2 mb-8">
           <div class="h-4 bg-white/5 rounded w-full"></div>
@@ -34,7 +34,7 @@
 
     <!-- Review cards -->
     <div *ngIf="!loading && !error" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mb-8">
-      <div *ngFor="let review of paginatedReviews; let i = index"
+      <div *ngFor="let review of paginatedReviews; let i = index; trackBy: trackByReview"
            data-cy="review-card"
            reveal
            [revealDelay]="revealDelay(i)"
@@ -48,7 +48,7 @@
 
         <!-- Stars -->
         <div data-cy="review-rating" class="flex items-center gap-1 mb-5 text-[#C65A1E]">
-          <iconify-icon *ngFor="let s of review.stars"
+          <iconify-icon *ngFor="let s of review.stars; trackBy: trackByStar"
                         [attr.icon]="s < review.rating ? 'solar:star-bold' : 'solar:star-linear'"
                         width="15"></iconify-icon>
           <span data-cy="rating-display" class="sr-only">{{ review.rating }}</span>
@@ -71,10 +71,10 @@
 
           <div class="flex flex-col items-end gap-1">
             <span *ngIf="review.source"
-                  class="text-[9px] text-neutral-500 uppercase tracking-widest border border-white/8 px-2 py-0.5 rounded-full">
+                  class="text-[10px] text-neutral-500 uppercase tracking-widest border border-white/8 px-2 py-0.5 rounded-full">
               {{ review.source }}
             </span>
-            <span data-cy="review-date" class="text-[9px] text-neutral-600">{{ review.date }}</span>
+            <span data-cy="review-date" class="text-[10px] text-neutral-600">{{ review.date }}</span>
           </div>
         </div>
 
@@ -123,7 +123,7 @@
           <div data-cy="rating-selector" class="flex gap-2 text-2xl">
             <button
               type="button"
-              *ngFor="let star of [1,2,3,4,5]"
+              *ngFor="let star of [1,2,3,4,5]; trackBy: trackByIndex"
               (click)="setRating(star)"
               [class.selected]="selectedRating >= star"
               class="text-neutral-600 transition-colors hover:text-[#C65A1E]"
