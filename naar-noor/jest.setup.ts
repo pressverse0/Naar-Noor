@@ -1,5 +1,6 @@
-// Angular test environment bootstrap provided by jest-preset-angular
-import 'jest-preset-angular/setup-jest';
+import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+
+setupZoneTestEnv();
 
 /**
  * Jasmine → Jest compatibility shim.

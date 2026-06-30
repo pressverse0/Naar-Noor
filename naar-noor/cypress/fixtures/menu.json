@@ -1,0 +1,80 @@
+[
+  {
+    "id": "item-1",
+    "name": "Lamb Rogan Josh",
+    "description": "Slow-cooked tender lamb in a rich aromatic Kashmiri sauce with whole spices.",
+    "price": 16.95,
+    "category": "Mains",
+    "isVegetarian": false,
+    "isVegan": false,
+    "isGlutenFree": true,
+    "isAvailable": true,
+    "imageUrl": "",
+    "sortOrder": 10
+  },
+  {
+    "id": "item-2",
+    "name": "Chicken Momos",
+    "description": "Steamed Himalayan dumplings filled with spiced minced chicken, served with achar.",
+    "price": 8.50,
+    "category": "Starters",
+    "isVegetarian": false,
+    "isVegan": false,
+    "isGlutenFree": false,
+    "isAvailable": true,
+    "imageUrl": "",
+    "sortOrder": 9
+  },
+  {
+    "id": "item-3",
+    "name": "Dal Bhat",
+    "description": "Traditional lentil soup with steamed rice, seasonal vegetables, and house pickles.",
+    "price": 12.50,
+    "category": "Mains",
+    "isVegetarian": true,
+    "isVegan": true,
+    "isGlutenFree": true,
+    "isAvailable": true,
+    "imageUrl": "",
+    "sortOrder": 8
+  },
+  {
+    "id": "item-4",
+    "name": "Mango Lassi",
+    "description": "Chilled blended yoghurt drink with sweet Alphonso mango and a hint of cardamom.",
+    "price": 4.50,
+    "category": "Drinks",
+    "isVegetarian": true,
+    "isVegan": false,
+    "isGlutenFree": true,
+    "isAvailable": true,
+    "imageUrl": "",
+    "sortOrder": 7
+  },
+  {
+    "id": "item-5",
+    "name": "Gulab Jamun",
+    "description": "Soft milk-solid dumplings soaked in rose-flavoured sugar syrup, served warm.",
+    "price": 5.95,
+    "category": "Desserts",
+    "isVegetarian": true,
+    "isVegan": false,
+    "isGlutenFree": false,
+    "isAvailable": true,
+    "imageUrl": "",
+    "sortOrder": 6
+  },
+  {
+    "id": "item-6",
+    "name": "Sekuwa",
+    "description": "Flame-grilled marinated mutton skewers with Himalayan herbs and spices.",
+    "price": 14.50,
+    "category": "Mains",
+    "isVegetarian": false,
+    "isVegan": false,
+    "isGlutenFree": true,
+    "isAvailable": true,
+    "imageUrl": "",
+    "sortOrder": 5
+  }
+]

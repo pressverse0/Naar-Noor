@@ -1,0 +1,654 @@
+Run npm run test:ci
+
+> @workspace/naar-noor@0.0.0 test:ci
+> jest --config jest.config.js --forceExit
+
+● Validation Warning:
+
+  Unknown option "coverageThresholds" with value {"global": {"branches": 65, "functions": 75, "lines": 75, "statements": 75}} was found. Did you mean "coverageThreshold"?
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+● Validation Warning:
+
+  Unknown option "coverageThresholds" with value {"global": {"branches": 65, "functions": 75, "lines": 75, "statements": 75}} was found. Did you mean "coverageThreshold"?
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+ts-jest[ts-jest-transformer] (WARN) Define `ts-jest` config under `globals` is deprecated. Please do
+transform: {
+    <transform_regex>: ['ts-jest', { /* ts-jest config goes here in Jest */ }],
+},
+See more at https://kulshekhar.github.io/ts-jest/docs/getting-started/presets#advanced
+ts-jest[ts-jest-transformer] (WARN) Define `ts-jest` config under `globals` is deprecated. Please do
+transform: {
+    <transform_regex>: ['ts-jest', { /* ts-jest config goes here in Jest */ }],
+},
+See more at https://kulshekhar.github.io/ts-jest/docs/getting-started/presets#advanced
+ts-jest[ts-jest-transformer] (WARN) Define `ts-jest` config under `globals` is deprecated. Please do
+transform: {
+    <transform_regex>: ['ts-jest', { /* ts-jest config goes here in Jest */ }],
+},
+See more at https://kulshekhar.github.io/ts-jest/docs/getting-started/presets#advanced
+PASS src/app/services/tests/cart.service.spec.ts (8.372 s)
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+FAIL src/app/services/tests/seo.service.spec.ts (9.052 s)
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+  ● SeoService — Meta-tag and Title Management (Property 14) › should use default description when none is provided
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Authentic Himalayan cuisine with flame-grilled specialties. Reserve your table or order online."
+    Received: "Authentic Himalayan cuisine with flame-grilled specialties, traditional mountain recipes, and modern dining. Reserve your table or order online at Naar & Noor."
+
+      72 |
+      73 |     const tag = metaService.getTag('name="description"');
+    > 74 |     expect(tag?.content).toBe(DEFAULT_DESCRIPTION);
+         |                          ^
+      75 |   });
+      76 |
+      77 |   // ---------------------------------------------------------------------------
+
+      at src/app/services/tests/seo.service.spec.ts:74:26
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:416:32)
+      at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (node_modules/zone.js/bundles/zone-testing.umd.js:2176:43)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:415:38)
+      at ZoneImpl.run (node_modules/zone.js/bundles/zone.umd.js:147:47)
+      at Object.wrappedFunc (node_modules/zone.js/bundles/zone-testing.umd.js:450:38)
+
+  ● SeoService — Meta-tag and Title Management (Property 14) › should not create canonical link when canonicalUrl is absent
+
+    expect(received).toBeNull()
+
+    Received: <link href="https://www.naarnooor.com" rel="canonical" />
+
+      179 |
+      180 |     const link = document.querySelector('link[rel="canonical"]');
+    > 181 |     expect(link).toBeNull();
+          |                  ^
+      182 |   });
+      183 |
+      184 |   // ---------------------------------------------------------------------------
+
+      at src/app/services/tests/seo.service.spec.ts:181:18
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:416:32)
+      at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (node_modules/zone.js/bundles/zone-testing.umd.js:2176:43)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:415:38)
+      at ZoneImpl.run (node_modules/zone.js/bundles/zone.umd.js:147:47)
+      at Object.wrappedFunc (node_modules/zone.js/bundles/zone-testing.umd.js:450:38)
+
+  ● SeoService — Meta-tag and Title Management (Property 14) › should handle empty description by falling back to default
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Authentic Himalayan cuisine with flame-grilled specialties. Reserve your table or order online."
+    Received: "Authentic Himalayan cuisine with flame-grilled specialties, traditional mountain recipes, and modern dining. Reserve your table or order online at Naar & Noor."
+
+      228 |
+      229 |     const tag = metaService.getTag('name="description"');
+    > 230 |     expect(tag?.content).toBe(DEFAULT_DESCRIPTION);
+          |                          ^
+      231 |   });
+      232 | });
+      233 |
+
+      at src/app/services/tests/seo.service.spec.ts:230:26
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:416:32)
+      at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (node_modules/zone.js/bundles/zone-testing.umd.js:2176:43)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:415:38)
+      at ZoneImpl.run (node_modules/zone.js/bundles/zone.umd.js:147:47)
+      at Object.wrappedFunc (node_modules/zone.js/bundles/zone-testing.umd.js:450:38)
+
+PASS src/app/services/tests/api.service.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/components/tests/cart-drawer.spec.ts (9.983 s)
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/components/tests/custom-calendar.component.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/services/tests/toast.service.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/services/tests/realtime.service.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+    console.error
+      Error parsing Realtime message: SyntaxError: Unexpected token 'o', "not-valid-json" is not valid JSON
+          at JSON.parse (<anonymous>)
+          at MockWebSocket.parse [as onmessage] (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/src/app/services/realtime.service.ts:38:26)
+          at /home/runner/work/Naar-Noor/Naar-Noor/naar-noor/src/app/services/tests/realtime.service.spec.ts:187:28
+          at Object.<anonymous> (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/expect/build/toThrowMatchers.js:74:11)
+          at Object.throwingMatcher [as toThrow] (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/expect/build/index.js:320:21)
+          at /home/runner/work/Naar-Noor/Naar-Noor/naar-noor/src/app/services/tests/realtime.service.spec.ts:188:13
+          at _ZoneDelegate.invoke (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/zone.js/bundles/zone.umd.js:416:32)
+          at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/zone.js/bundles/zone-testing.umd.js:2176:43)
+          at _ZoneDelegate.invoke (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/zone.js/bundles/zone.umd.js:415:38)
+          at ZoneImpl.run (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/zone.js/bundles/zone.umd.js:147:47)
+          at Object.wrappedFunc (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/zone.js/bundles/zone-testing.umd.js:450:38)
+          at Promise.then.completed (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/runner/work/Naar-Noor/Naar-Noor/naar-noor/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+
+      47 |         }
+      48 |       } catch (e) {
+    > 49 |         console.error('Error parsing Realtime message:', e);
+         |                 ^
+      50 |       }
+      51 |     };
+      52 |
+
+      at MockWebSocket.error [as onmessage] (src/app/services/realtime.service.ts:49:17)
+      at src/app/services/tests/realtime.service.spec.ts:187:28
+      at Object.<anonymous> (node_modules/expect/build/toThrowMatchers.js:74:11)
+      at Object.throwingMatcher [as toThrow] (node_modules/expect/build/index.js:320:21)
+      at src/app/services/tests/realtime.service.spec.ts:188:13
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:416:32)
+      at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (node_modules/zone.js/bundles/zone-testing.umd.js:2176:43)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:415:38)
+      at ZoneImpl.run (node_modules/zone.js/bundles/zone.umd.js:147:47)
+      at Object.wrappedFunc (node_modules/zone.js/bundles/zone-testing.umd.js:450:38)
+
+    console.error
+      Realtime WebSocket error: Event { isTrusted: [Getter] }
+
+      60 |
+      61 |     this.socket.onerror = (err) => {
+    > 62 |       console.error('Realtime WebSocket error:', err);
+         |               ^
+      63 |     };
+      64 |   }
+      65 |
+
+      at MockWebSocket.error [as onerror] (src/app/services/realtime.service.ts:62:15)
+      at MockWebSocket.simulateError (src/app/services/tests/realtime.service.spec.ts:36:28)
+      at src/app/services/tests/realtime.service.spec.ts:195:28
+      at Object.<anonymous> (node_modules/expect/build/toThrowMatchers.js:74:11)
+      at Object.throwingMatcher [as toThrow] (node_modules/expect/build/index.js:320:21)
+      at src/app/services/tests/realtime.service.spec.ts:195:49
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:416:32)
+      at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (node_modules/zone.js/bundles/zone-testing.umd.js:2176:43)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:415:38)
+      at ZoneImpl.run (node_modules/zone.js/bundles/zone.umd.js:147:47)
+      at Object.wrappedFunc (node_modules/zone.js/bundles/zone-testing.umd.js:450:38)
+
+PASS src/app/components/tests/toast.component.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/services/tests/auth.service.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/services/tests/theme.service.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/components/tests/custom-dropdown.component.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/components/tests/header.component.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/services/tests/dropdown-manager.service.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+PASS src/app/components/tests/animated-background.component.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+FAIL src/app/components/tests/footer.component.spec.ts
+  ● Console
+
+    console.warn
+      
+          Importing "setup-jest.js" directly is deprecated. The file "setup-jest.js" will be removed in the future.
+          Please use "setupZoneTestEnv" function instead. Example:
+      
+          // setup-jest.ts
+          import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+      
+          setupZoneTestEnv();
+
+      1 | // Angular test environment bootstrap provided by jest-preset-angular
+    > 2 | import 'jest-preset-angular/setup-jest';
+        | ^
+      3 |
+      4 | /**
+      5 |  * Jasmine → Jest compatibility shim.
+
+      at Object.<anonymous> (node_modules/jest-preset-angular/setup-jest.js:1:111)
+      at Object.<anonymous> (jest.setup.ts:2:1)
+
+  ● FooterComponent › should create
+
+    NullInjectorError: R3InjectorError(Standalone[FooterComponent])[ActivatedRoute -> ActivatedRoute -> ActivatedRoute]: 
+      NullInjectorError: No provider for ActivatedRoute!
+
+      at NullInjector.get (node_modules/@angular/core/fesm2022/core.mjs:1663:27)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at ChainedInjector.get (node_modules/@angular/core/fesm2022/core.mjs:5454:36)
+      at lookupTokenUsingModuleInjector (node_modules/@angular/core/fesm2022/core.mjs:5807:39)
+      at getOrCreateInjectable (node_modules/@angular/core/fesm2022/core.mjs:5855:12)
+      at ɵɵdirectiveInject (node_modules/@angular/core/fesm2022/core.mjs:11933:19)
+      at NodeInjectorFactory._RouterLink_Factory [as factory] (ng:/_RouterLink/ɵfac.js:6:7)
+      at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:6067:44)
+      at instantiateAllDirectives (node_modules/@angular/core/fesm2022/core.mjs:12803:27)
+      at createDirectivesInstances (node_modules/@angular/core/fesm2022/core.mjs:12199:5)
+      at ɵɵelementStart (node_modules/@angular/core/fesm2022/core.mjs:24360:9)
+      at FooterComponent_Template (ng:/FooterComponent.js:57:50)
+      at executeTemplate (node_modules/@angular/core/fesm2022/core.mjs:12159:9)
+      at renderView (node_modules/@angular/core/fesm2022/core.mjs:13366:13)
+      at renderComponent (node_modules/@angular/core/fesm2022/core.mjs:13312:5)
+      at renderChildComponents (node_modules/@angular/core/fesm2022/core.mjs:13414:9)
+      at renderView (node_modules/@angular/core/fesm2022/core.mjs:13394:13)
+      at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:16768:17)
+      at initComponent (node_modules/@angular/core/fesm2022/testing.mjs:2039:51)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:416:32)
+      at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:7251:33)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:415:38)
+      at ZoneImpl.run (node_modules/zone.js/bundles/zone.umd.js:147:47)
+      at NgZone.run (node_modules/@angular/core/fesm2022/core.mjs:7097:28)
+      at _TestBedImpl.createComponent (node_modules/@angular/core/fesm2022/testing.mjs:2051:41)
+      at Function.createComponent (node_modules/@angular/core/fesm2022/testing.mjs:1842:37)
+      at src/app/components/tests/footer.component.spec.ts:15:23
+
+  ● FooterComponent › should have the current year set
+
+    NullInjectorError: R3InjectorError(Standalone[FooterComponent])[ActivatedRoute -> ActivatedRoute -> ActivatedRoute]: 
+      NullInjectorError: No provider for ActivatedRoute!
+
+      at NullInjector.get (node_modules/@angular/core/fesm2022/core.mjs:1663:27)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at ChainedInjector.get (node_modules/@angular/core/fesm2022/core.mjs:5454:36)
+      at lookupTokenUsingModuleInjector (node_modules/@angular/core/fesm2022/core.mjs:5807:39)
+      at getOrCreateInjectable (node_modules/@angular/core/fesm2022/core.mjs:5855:12)
+      at ɵɵdirectiveInject (node_modules/@angular/core/fesm2022/core.mjs:11933:19)
+      at NodeInjectorFactory._RouterLink_Factory [as factory] (ng:/_RouterLink/ɵfac.js:6:7)
+      at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:6067:44)
+      at instantiateAllDirectives (node_modules/@angular/core/fesm2022/core.mjs:12803:27)
+      at createDirectivesInstances (node_modules/@angular/core/fesm2022/core.mjs:12199:5)
+      at ɵɵelementStart (node_modules/@angular/core/fesm2022/core.mjs:24360:9)
+      at FooterComponent_Template (ng:/FooterComponent.js:57:50)
+      at executeTemplate (node_modules/@angular/core/fesm2022/core.mjs:12159:9)
+      at renderView (node_modules/@angular/core/fesm2022/core.mjs:13366:13)
+      at renderComponent (node_modules/@angular/core/fesm2022/core.mjs:13312:5)
+      at renderChildComponents (node_modules/@angular/core/fesm2022/core.mjs:13414:9)
+      at renderView (node_modules/@angular/core/fesm2022/core.mjs:13394:13)
+      at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:16768:17)
+      at initComponent (node_modules/@angular/core/fesm2022/testing.mjs:2039:51)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:416:32)
+      at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:7251:33)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:415:38)
+      at ZoneImpl.run (node_modules/zone.js/bundles/zone.umd.js:147:47)
+      at NgZone.run (node_modules/@angular/core/fesm2022/core.mjs:7097:28)
+      at _TestBedImpl.createComponent (node_modules/@angular/core/fesm2022/testing.mjs:2051:41)
+      at Function.createComponent (node_modules/@angular/core/fesm2022/testing.mjs:1842:37)
+      at src/app/components/tests/footer.component.spec.ts:15:23
+
+  ● FooterComponent › currentYear should be a positive integer
+
+    NullInjectorError: R3InjectorError(Standalone[FooterComponent])[ActivatedRoute -> ActivatedRoute -> ActivatedRoute]: 
+      NullInjectorError: No provider for ActivatedRoute!
+
+      at NullInjector.get (node_modules/@angular/core/fesm2022/core.mjs:1663:27)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at R3Injector.get (node_modules/@angular/core/fesm2022/core.mjs:3109:33)
+      at ChainedInjector.get (node_modules/@angular/core/fesm2022/core.mjs:5454:36)
+      at lookupTokenUsingModuleInjector (node_modules/@angular/core/fesm2022/core.mjs:5807:39)
+      at getOrCreateInjectable (node_modules/@angular/core/fesm2022/core.mjs:5855:12)
+      at ɵɵdirectiveInject (node_modules/@angular/core/fesm2022/core.mjs:11933:19)
+      at NodeInjectorFactory._RouterLink_Factory [as factory] (ng:/_RouterLink/ɵfac.js:6:7)
+      at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:6067:44)
+      at instantiateAllDirectives (node_modules/@angular/core/fesm2022/core.mjs:12803:27)
+      at createDirectivesInstances (node_modules/@angular/core/fesm2022/core.mjs:12199:5)
+      at ɵɵelementStart (node_modules/@angular/core/fesm2022/core.mjs:24360:9)
+      at FooterComponent_Template (ng:/FooterComponent.js:57:50)
+      at executeTemplate (node_modules/@angular/core/fesm2022/core.mjs:12159:9)
+      at renderView (node_modules/@angular/core/fesm2022/core.mjs:13366:13)
+      at renderComponent (node_modules/@angular/core/fesm2022/core.mjs:13312:5)
+      at renderChildComponents (node_modules/@angular/core/fesm2022/core.mjs:13414:9)
+      at renderView (node_modules/@angular/core/fesm2022/core.mjs:13394:13)
+      at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:16768:17)
+      at initComponent (node_modules/@angular/core/fesm2022/testing.mjs:2039:51)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:416:32)
+      at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:7251:33)
+      at _ZoneDelegate.invoke (node_modules/zone.js/bundles/zone.umd.js:415:38)
+      at ZoneImpl.run (node_modules/zone.js/bundles/zone.umd.js:147:47)
+      at NgZone.run (node_modules/@angular/core/fesm2022/core.mjs:7097:28)
+      at _TestBedImpl.createComponent (node_modules/@angular/core/fesm2022/testing.mjs:2051:41)
+      at Function.createComponent (node_modules/@angular/core/fesm2022/testing.mjs:1842:37)
+      at src/app/components/tests/footer.component.spec.ts:15:23
+
+-----------------------------------|---------|----------|---------|---------|-----------------------------
+File                               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s           
+-----------------------------------|---------|----------|---------|---------|-----------------------------
+All files                          |   82.33 |    71.97 |   82.38 |   83.36 |                             
+ components/animated-background    |     100 |      100 |     100 |     100 |                             
+  animated-background.component.ts |     100 |      100 |     100 |     100 |                             
+ components/auth-modal             |    30.3 |       16 |   26.31 |   34.93 |                             
+  auth-modal.component.ts          |    30.3 |       16 |   26.31 |   34.93 | 273-279,291-378             
+ components/cart-drawer            |   92.53 |    78.94 |   89.47 |    91.8 |                             
+  cart-drawer.component.ts         |   92.53 |    78.94 |   89.47 |    91.8 | 400,413-416                 
+ components/custom-calendar        |     100 |      100 |     100 |     100 |                             
+  custom-calendar.component.ts     |     100 |      100 |     100 |     100 |                             
+ components/custom-dropdown        |     100 |      100 |     100 |     100 |                             
+  custom-dropdown.component.ts     |     100 |      100 |     100 |     100 |                             
+ components/footer                 |     100 |      100 |     100 |     100 |                             
+  footer.component.ts              |     100 |      100 |     100 |     100 |                             
+ components/header                 |   90.62 |       75 |   88.88 |   89.65 |                             
+  header.component.ts              |   90.62 |       75 |   88.88 |   89.65 | 52-54                       
+ components/toast                  |     100 |      100 |     100 |     100 |                             
+  toast.component.ts               |     100 |      100 |     100 |     100 |                             
+ services                          |    88.7 |    79.54 |   85.21 |   89.18 |                             
+  api.service.ts                   |      70 |       75 |      60 |   69.69 | 73-77,88,94,100,106,112-117 
+  auth.service.ts                  |   93.22 |    76.92 |      92 |   92.45 | 63,104,117,135              
+  cart.service.ts                  |      86 |       50 |      90 |   84.37 | 57-62                       
+  dropdown-manager.service.ts      |     100 |      100 |     100 |     100 |                             
+  realtime.service.ts              |   82.35 |    75.86 |      75 |   85.48 | 54-58,134-148               
+  seo.service.ts                   |     100 |      100 |     100 |     100 |                             
+  theme.service.ts                 |     100 |      100 |     100 |     100 |                             
+  toast.service.ts                 |     100 |      100 |     100 |     100 |                             
+-----------------------------------|---------|----------|---------|---------|-----------------------------
+Test Suites: 2 failed, 13 passed, 15 total
+Tests:       6 failed, 192 passed, 198 total
+Snapshots:   0 total
+Time:        15.105 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
+Error: Process completed with exit code 1.

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "chef-1",
+    "name": "Arjun Thapa",
+    "title": "Head Chef",
+    "specialty": "Himalayan & Nepalese cuisine",
+    "bio": "Arjun brings 15 years of experience from the foothills of the Himalayas.",
+    "isAvailable": true
+  },
+  {
+    "id": "chef-2",
+    "name": "Priya Rai",
+    "title": "Sous Chef",
+    "specialty": "Vegetarian & vegan Himalayan dishes",
+    "bio": "Priya is a specialist in plant-based Himalayan cooking traditions.",
+    "isAvailable": true
+  }
+]

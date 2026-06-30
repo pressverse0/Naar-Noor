@@ -1,99 +1,68 @@
 /**
  * LoginPage Page Object
- * Encapsulates UI interactions for authentication workflows
+ * Encapsulates UI interactions for authentication workflows.
+ *
+ * Auth state is reflected by:
+ *   Logged IN  → `[data-user-menu]` is visible in the header
+ *   Logged OUT → `[data-user-menu]` does not exist
  */
 
 export class LoginPage {
-  /**
-   * Navigate to login page
-   */
   static visit() {
     cy.visit('/login');
   }
 
-  /**
-   * Get email input field
-   */
   static getEmailInput() {
     return cy.get('input[type="email"]');
   }
 
-  /**
-   * Get password input field
-   */
   static getPasswordInput() {
     return cy.get('input[type="password"]');
   }
 
-  /**
-   * Get login button
-   */
   static getLoginButton() {
-    return cy.get('button[type="submit"]').contains('Login');
+    return cy.get('button[type="submit"]');
   }
 
-  /**
-   * Get logout button
-   */
   static getLogoutButton() {
     return cy.get('button').contains('Logout');
   }
 
-  /**
-   * Enter email
-   */
   static enterEmail(email: string) {
-    this.getEmailInput().type(email);
+    this.getEmailInput().clear().type(email);
   }
 
-  /**
-   * Enter password
-   */
   static enterPassword(password: string) {
-    this.getPasswordInput().type(password);
+    this.getPasswordInput().clear().type(password);
   }
 
-  /**
-   * Click login button
-   */
   static clickLogin() {
     this.getLoginButton().click();
   }
 
-  /**
-   * Click logout button
-   */
   static clickLogout() {
+    // The logout button is inside the user-menu dropdown in the header.
+    cy.get('[data-user-menu]').click();
     this.getLogoutButton().click();
   }
 
-  /**
-   * Login with credentials
-   */
   static login(email: string, password: string) {
     this.enterEmail(email);
     this.enterPassword(password);
     this.clickLogin();
   }
 
-  /**
-   * Verify error message appears
-   */
   static verifyErrorMessage(message: string) {
     cy.contains(message).should('be.visible');
   }
 
-  /**
-   * Verify user is logged in
-   */
+  /** User is logged in when the header shows the avatar / user-menu container. */
   static verifyLoggedIn() {
-    cy.get('[data-cy="user-menu"]').should('exist');
+    cy.get('[data-user-menu]').should('exist');
   }
 
-  /**
-   * Verify user is logged out
-   */
+  /** User is logged out when the user-menu container is gone. */
   static verifyLoggedOut() {
-    this.getLoginButton().should('exist');
+    cy.get('[data-user-menu]').should('not.exist');
   }
 }

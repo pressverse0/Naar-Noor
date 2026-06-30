@@ -1,91 +1,92 @@
 /**
  * ReservationPage Page Object
- * Encapsulates UI interactions for reservation workflow
+ * Encapsulates UI interactions for the reservation booking workflow.
+ *
+ * The booking form uses Angular Reactive Forms with formControlName.
+ * Angular does NOT add a `name` attribute for reactive controls, so we
+ * select by input type or formControlName attribute:
+ *
+ *   [formControlName="date"]         → input[type="date"]
+ *   [formControlName="time"]         → input[type="time"]
+ *   [formControlName="guestCount"]   → input[type="number"]
+ *   [formControlName="specialRequests"] → input[type="text"]
+ *
+ * The form is only visible after selecting a chef AND being authenticated.
+ * Use cy.visitAuthenticated('/reservations') in beforeEach.
  */
 
 export class ReservationPage {
-  /**
-   * Navigate to reservations page
-   */
   static visit() {
     cy.visit('/reservations');
   }
 
-  /**
-   * Get chef card at index
-   */
-  static getChefCard(index: number = 0) {
+  static visitAuthenticated(email?: string) {
+    cy.visitAuthenticated('/reservations', email);
+  }
+
+  static getChefCard(index = 0) {
     return cy.get('[data-cy="chef-card"]').eq(index);
   }
 
-  /**
-   * Click chef to view details
-   */
-  static selectChef(index: number = 0) {
+  static selectChef(index = 0) {
     this.getChefCard(index).click();
   }
 
-  /**
-   * Set reservation date
-   */
+  static getDateInput() {
+    return cy.get('[formControlName="date"]');
+  }
+
+  static getTimeInput() {
+    return cy.get('[formControlName="time"]');
+  }
+
+  static getGuestCountInput() {
+    return cy.get('[formControlName="guestCount"]');
+  }
+
+  static getSpecialRequestsInput() {
+    return cy.get('[formControlName="specialRequests"]');
+  }
+
   static setDate(date: string) {
-    cy.get('input[name="date"]').type(date);
+    this.getDateInput().clear().type(date);
   }
 
-  /**
-   * Set reservation time
-   */
   static setTime(time: string) {
-    cy.get('input[name="time"]').type(time);
+    this.getTimeInput().clear().type(time);
   }
 
-  /**
-   * Set guest count
-   */
   static setGuestCount(count: number) {
-    cy.get('input[name="guestCount"]').type(count.toString());
+    this.getGuestCountInput().clear().type(count.toString());
   }
 
-  /**
-   * Set special requests
-   */
   static setSpecialRequests(requests: string) {
-    cy.get('input[name="specialRequests"]').type(requests);
+    this.getSpecialRequestsInput().clear().type(requests);
   }
 
-  /**
-   * Submit reservation form
-   */
   static submitReservation() {
     cy.get('button[type="submit"]').click();
   }
 
-  /**
-   * Verify reservation confirmation
-   */
   static verifyConfirmation() {
     cy.get('[data-cy="reservation-confirmation"]').should('exist');
-    cy.contains('Reservation confirmed').should('exist');
+    cy.contains(/reservation confirmed/i).should('exist');
   }
 
-  /**
-   * Get confirmation number
-   */
   static getConfirmationNumber() {
     return cy.get('[data-cy="confirmation-number"]');
   }
 
-  /**
-   * Verify error message
-   */
   static verifyErrorMessage(field: string, message: string) {
     cy.get(`[data-cy="error-${field}"]`).should('contain', message);
   }
 
-  /**
-   * Complete full reservation
-   */
-  static completeReservation(date: string, time: string, guestCount: number, requests?: string) {
+  static completeReservation(
+    date: string,
+    time: string,
+    guestCount: number,
+    requests?: string
+  ) {
     this.setDate(date);
     this.setTime(time);
     this.setGuestCount(guestCount);

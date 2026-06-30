@@ -1,7 +1,15 @@
 /// <reference types="cypress" />
+import { interceptMenu } from '../support/db-isolation';
 
+/**
+ * Navigation E2E Tests
+ *
+ * DB_AVAILABLE = true  → real menu API (passthrough intercept)
+ * DB_AVAILABLE = false → fixture stub (menu.json)
+ */
 describe('Navigation E2E Tests', () => {
   beforeEach(() => {
+    interceptMenu();
     cy.visit('/');
   });
 
@@ -44,7 +52,7 @@ describe('Navigation E2E Tests', () => {
       cy.contains('Menu').click();
       cy.url().should('include', '/menu');
       cy.contains('Home').click();
-      cy.url().should('include', '/');
+      cy.url().should('not.include', '/menu');
     });
 
     it('should navigate to menu', () => {
@@ -73,8 +81,14 @@ describe('Navigation E2E Tests', () => {
       cy.get('[data-cy="cart-icon"]').should('exist');
     });
 
-    it('should display cart count', () => {
-      cy.get('[data-cy="cart-badge"]').should('exist');
+    it('hides cart badge when cart is empty, shows it after adding an item', () => {
+      cy.get('[data-cy="cart-badge"]').should('not.exist');
+
+      cy.visit('/menu');
+      cy.wait('@getMenu');
+      cy.get('[data-cy="menu-item"]').first().find('button').contains('Add').click();
+
+      cy.get('[data-cy="cart-badge"]').should('exist').and('contain', '1');
     });
 
     it('should open cart drawer', () => {
@@ -114,13 +128,15 @@ describe('Navigation E2E Tests', () => {
   describe('Breadcrumb Navigation', () => {
     it('should display breadcrumb on menu', () => {
       cy.visit('/menu');
+      cy.wait('@getMenu');
       cy.get('[data-cy="breadcrumb"]').should('exist');
     });
 
     it('should navigate via breadcrumb', () => {
       cy.visit('/menu');
+      cy.wait('@getMenu');
       cy.get('[data-cy="breadcrumb"]').contains('Home').click();
-      cy.url().should('include', '/');
+      cy.url().should('not.include', '/menu');
     });
   });
 
@@ -157,8 +173,8 @@ describe('Navigation E2E Tests', () => {
     });
 
     it('should preserve search in URL', () => {
-      cy.visit('/menu?search=Biryani');
-      cy.url().should('include', 'search=Biryani');
+      cy.visit('/menu?search=Lamb');
+      cy.url().should('include', 'search=Lamb');
     });
 
     it('should handle multiple parameters', () => {
@@ -171,14 +187,16 @@ describe('Navigation E2E Tests', () => {
   describe('Back Navigation', () => {
     it('should navigate back', () => {
       cy.visit('/menu');
-      cy.visit('/menu/1');
+      cy.wait('@getMenu');
+      cy.visit('/about');
       cy.go('back');
       cy.url().should('include', '/menu');
     });
 
-    it('should maintain state on back', () => {
+    it('should maintain query params on back', () => {
       cy.visit('/menu?category=Mains');
-      cy.visit('/menu/1');
+      cy.wait('@getMenu');
+      cy.visit('/about');
       cy.go('back');
       cy.url().should('include', 'category=Mains');
     });
@@ -186,14 +204,14 @@ describe('Navigation E2E Tests', () => {
 
   describe('404 Handling', () => {
     it('should display 404 page for invalid route', () => {
-      cy.visit('/nonexistent', { failOnStatusCode: false });
+      cy.visit('/nonexistent-page', { failOnStatusCode: false });
       cy.contains('Page not found').should('be.visible');
     });
 
     it('should have link to home from 404', () => {
-      cy.visit('/nonexistent', { failOnStatusCode: false });
+      cy.visit('/nonexistent-page', { failOnStatusCode: false });
       cy.contains('Home').click();
-      cy.url().should('include', '/');
+      cy.url().should('not.include', '/nonexistent');
     });
   });
 });

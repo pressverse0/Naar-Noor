@@ -8,6 +8,16 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  transform: {
+    '^.+\\.(ts|js|mjs|html|svg)$': [
+      'jest-preset-angular',
+      {
+        tsconfig: '<rootDir>/tsconfig.spec.json',
+        stringifyContentPathRegex: '\\.html$',
+        diagnostics: false,
+      },
+    ],
+  },
   transformIgnorePatterns: [
     'node_modules/(?!(@angular|rxjs|zone.js)/)',
   ],
@@ -23,19 +33,12 @@ module.exports = {
     '!src/app/**/tests/component-test.base.ts',
     '!src/app/**/tests/service-test.base.ts',
   ],
-  coverageThresholds: {
+  coverageThreshold: {
     global: {
       statements: 75,
       branches: 65,
       functions: 75,
       lines: 75,
-    },
-  },
-  globals: {
-    'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.spec.json',
-      stringifyContentPathRegex: '\\.html$',
-      diagnostics: false,
     },
   },
 };

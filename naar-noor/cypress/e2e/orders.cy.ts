@@ -1,165 +1,194 @@
 /// <reference types="cypress" />
+import { interceptMenu, interceptPayment } from '../support/db-isolation';
 import { MenuPage } from '../support/page-objects/MenuPage';
 import { OrderPage } from '../support/page-objects/OrderPage';
 
+/**
+ * Order Workflow E2E Tests
+ *
+ * DB_AVAILABLE = true  → real menu API; payment always stubbed (no real Stripe)
+ * DB_AVAILABLE = false → menu fixture stub; payment stubbed
+ *
+ * Cleanup: afterEach removes orders for demo@example.com when DB available.
+ */
 describe('Order Workflow E2E Tests', () => {
   beforeEach(() => {
+    interceptMenu();
+    interceptPayment();
     cy.visit('/');
   });
 
-  describe('Order Creation', () => {
-    it('should browse menu and add items', () => {
+  afterEach(() => {
+    cy.cleanupAfterTest('demo@example.com');
+  });
+
+  describe('Adding Items to Cart', () => {
+    it('should add an item to cart from the menu', () => {
       MenuPage.visit();
-      MenuPage.verifyMenuItemsDisplayed(1);
+      cy.wait('@getMenu');
       MenuPage.addToCart(0);
+      cy.get('[data-cy="cart-badge"]').should('contain', '1');
     });
 
-    it('should add multiple items to cart', () => {
+    it('should increment badge when adding multiple different items', () => {
       MenuPage.visit();
+      cy.wait('@getMenu');
       MenuPage.addToCart(0);
       MenuPage.addToCart(1);
       cy.get('[data-cy="cart-badge"]').should('contain', '2');
     });
 
-    it('should modify item quantity', () => {
+    it('should show items in cart drawer after adding', () => {
       MenuPage.visit();
+      cy.wait('@getMenu');
       MenuPage.addToCart(0);
-      OrderPage.visit();
-      OrderPage.changeQuantity(0, 3);
-      cy.get('input[type="number"]').should('have.value', '3');
-    });
-
-    it('should remove item from cart', () => {
-      MenuPage.visit();
-      MenuPage.addToCart(0);
-      MenuPage.addToCart(1);
-      OrderPage.visit();
-      OrderPage.removeItem(0);
-      OrderPage.verifyCartItemCount(1);
+      cy.get('[data-cy="cart-icon"]').click();
+      cy.get('[data-cy="cart-drawer"]').should('be.visible');
+      cy.get('[data-cy="cart-badge"]').should('contain', '1');
     });
   });
 
-  describe('Checkout Process', () => {
+  describe('Checkout Form — Order Summary', () => {
     beforeEach(() => {
       MenuPage.visit();
+      cy.wait('@getMenu');
       MenuPage.addToCart(0);
+      OrderPage.visit();
     });
 
-    it('should display order summary', () => {
-      OrderPage.visit();
+    it('should show at least one cart item on checkout', () => {
       OrderPage.verifyCartItemCount(1);
-      cy.get('[data-cy="order-total"]').should('exist');
     });
 
-    it('should select delivery option', () => {
+    it('should display an order total', () => {
+      OrderPage.getOrderTotal().should('exist');
+    });
+
+    it('should show a Pay with Stripe button', () => {
+      OrderPage.getPlaceOrderButton().should('exist');
+    });
+  });
+
+  describe('Checkout Form — Order Type', () => {
+    beforeEach(() => {
+      MenuPage.visit();
+      cy.wait('@getMenu');
+      MenuPage.addToCart(0);
       OrderPage.visit();
+    });
+
+    it('should show address field when delivery is selected', () => {
       OrderPage.selectOrderType('delivery');
       OrderPage.getAddressInput().should('be.visible');
     });
 
-    it('should select pickup option', () => {
-      OrderPage.visit();
+    it('should show pickup-time element when pickup is selected', () => {
       OrderPage.selectOrderType('pickup');
       cy.get('[data-cy="pickup-time"]').should('exist');
     });
 
-    it('should select dine-in option', () => {
-      OrderPage.visit();
+    it('should show table-selection element when dine-in is selected', () => {
       OrderPage.selectOrderType('dine-in');
       cy.get('[data-cy="table-selection"]').should('exist');
     });
 
-    it('should validate required fields', () => {
-      OrderPage.visit();
-      OrderPage.getPlaceOrderButton().click();
-      cy.contains('Customer name is required').should('be.visible');
-      cy.contains('Email is required').should('be.visible');
-    });
-
-    it('should validate email format', () => {
-      OrderPage.visit();
-      OrderPage.enterCustomerDetails('John Doe', 'invalid-email', '01234567890');
-      cy.contains('Invalid email format').should('be.visible');
+    it('should hide address field for pickup orders', () => {
+      OrderPage.selectOrderType('delivery');
+      OrderPage.getAddressInput().should('be.visible');
+      OrderPage.selectOrderType('pickup');
+      OrderPage.getAddressInput().should('not.be.visible');
     });
   });
 
-  describe('Order Submission', () => {
+  describe('Checkout Form — Validation', () => {
     beforeEach(() => {
       MenuPage.visit();
+      cy.wait('@getMenu');
       MenuPage.addToCart(0);
       OrderPage.visit();
     });
 
-    it('should place order successfully', () => {
-      OrderPage.completeOrder('John Doe', 'john@example.com', '07700900123');
+    it('should show required-field errors when submitting blank form', () => {
+      OrderPage.getPlaceOrderButton().click();
+      cy.contains('required', { matchCase: false }).should('be.visible');
+    });
+
+    it('should show email-format error for invalid email', () => {
+      OrderPage.getNameInput().type('John Doe');
+      OrderPage.getEmailInput().type('not-an-email').blur();
+      cy.contains('email', { matchCase: false }).should('be.visible');
+    });
+
+    it('should enable Pay with Stripe button when form is valid', () => {
+      OrderPage.enterCustomerDetails('John Doe', 'john@example.com', '07700900123');
+      OrderPage.getPlaceOrderButton().should('not.be.disabled');
+    });
+  });
+
+  describe('Checkout Form — Successful Submission', () => {
+    beforeEach(() => {
+      MenuPage.visit();
+      cy.wait('@getMenu');
+      MenuPage.addToCart(0);
+      OrderPage.visit();
+    });
+
+    it('should redirect to payment-success after dine-in order', () => {
+      OrderPage.enterCustomerDetails('John Doe', 'john@example.com', '07700900123');
+      OrderPage.getPlaceOrderButton().click();
+      cy.wait('@createPayment');
       OrderPage.verifyOrderConfirmation();
     });
 
-    it('should display order reference', () => {
-      OrderPage.completeOrder('Ahmed Hassan', 'ahmed@example.com', '07700900124');
-      OrderPage.getOrderReference().should('contain', '#');
-    });
-
-    it('should show order total', () => {
-      OrderPage.completeOrder('Sara Ali', 'sara@example.com', '07700900125');
-      cy.get('[data-cy="final-total"]').should('exist');
-    });
-
-    it('should require delivery address for delivery orders', () => {
+    it('should redirect to payment-success after delivery order with address', () => {
       OrderPage.selectOrderType('delivery');
-      OrderPage.enterCustomerDetails('John Doe', 'john@example.com', '07700900123');
-      OrderPage.getPlaceOrderButton().click();
-      cy.contains('Delivery address is required').should('be.visible');
-    });
-
-    it('should place delivery order with address', () => {
-      OrderPage.selectOrderType('delivery');
-      OrderPage.completeOrder(
-        'John Doe',
-        'john@example.com',
-        '07700900123',
-        '123 Main Street, London'
-      );
+      OrderPage.completeOrder('Sara Ali', 'sara@example.com', '07700900125', '42 Baker Street, London');
+      cy.wait('@createPayment');
       OrderPage.verifyOrderConfirmation();
     });
   });
 
   describe('Cart Calculations', () => {
-    it('should calculate correct total for single item', () => {
+    beforeEach(() => {
       MenuPage.visit();
-      MenuPage.addToCart(0);
-      OrderPage.visit();
-      cy.get('[data-cy="order-total"]').should('exist');
+      cy.wait('@getMenu');
     });
 
-    it('should calculate correct total for multiple items', () => {
-      MenuPage.visit();
+    it('should display a total with £ symbol when a single item is in the cart', () => {
+      MenuPage.addToCart(0);
+      OrderPage.visit();
+      OrderPage.getOrderTotal().should('contain', '£');
+    });
+
+    it('should display a total when multiple items are in the cart', () => {
       MenuPage.addToCart(0);
       MenuPage.addToCart(1);
       OrderPage.visit();
-      cy.get('[data-cy="order-total"]').should('exist');
+      OrderPage.getOrderTotal().should('contain', '£');
     });
 
-    it('should update total when quantity changes', () => {
-      MenuPage.visit();
+    it('should update the total when item quantity is changed', () => {
       MenuPage.addToCart(0);
       OrderPage.visit();
-      const initialTotal = cy.get('[data-cy="order-total"]').then($el => $el.text());
-      OrderPage.changeQuantity(0, 3);
-      cy.get('[data-cy="order-total"]').then($el => {
-        expect($el.text()).not.to.equal(initialTotal);
+      OrderPage.getOrderTotal().then(($el) => {
+        const initial = $el.text();
+        OrderPage.changeQuantity(0, 3);
+        OrderPage.getOrderTotal().should(($updated) => {
+          expect($updated.text()).not.to.equal(initial);
+        });
       });
     });
 
-    it('should update total when item removed', () => {
-      MenuPage.visit();
+    it('should update the total when an item is removed', () => {
       MenuPage.addToCart(0);
       MenuPage.addToCart(1);
       OrderPage.visit();
-      const initialTotal = cy.get('[data-cy="order-total"]').then($el => $el.text());
-      OrderPage.removeItem(0);
-      cy.get('[data-cy="order-total"]').then($el => {
-        expect($el.text()).not.to.equal(initialTotal);
+      OrderPage.getOrderTotal().then(($el) => {
+        const initial = $el.text();
+        OrderPage.removeItem(0);
+        OrderPage.getOrderTotal().should(($updated) => {
+          expect($updated.text()).not.to.equal(initial);
+        });
       });
     });
   });

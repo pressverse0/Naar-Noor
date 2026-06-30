@@ -1,0 +1,9 @@
+{
+  "id": "RSV1234",
+  "customerName": "Test User",
+  "email": "test@example.com",
+  "reservationDate": "2026-08-15",
+  "reservationTime": "19:00",
+  "partySize": 2,
+  "status": "Confirmed"
+}

@@ -6,7 +6,7 @@ export type { SeoConfig };
 
 const BASE      = 'Naar & Noor';
 const SITE_URL  = 'https://www.naarnooor.com';
-const DEF_DESC  = 'Authentic Himalayan cuisine with flame-grilled specialties, traditional mountain recipes, and modern dining. Reserve your table or order online at Naar & Noor.';
+const DEF_DESC  = 'Authentic Himalayan cuisine with flame-grilled specialties. Reserve your table or order online.';
 const DEF_IMG   = `${SITE_URL}/assets/hero/hero.webp`;
 const DEF_KW    = 'Himalayan restaurant, Naar Noor, flame grilled, momos, Himalayan cuisine, Nepali food, mountain food, dine in, takeaway, delivery, Guernsey restaurant';
 
@@ -45,14 +45,15 @@ export class SeoService {
       this.meta.updateTag({ name: 'robots', content: 'index, follow' });
     }
 
-    const canonical = config.canonicalUrl ?? url;
-    let link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = 'canonical';
-      document.head.appendChild(link);
+    if (config.canonicalUrl) {
+      let link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'canonical';
+        document.head.appendChild(link);
+      }
+      link.href = config.canonicalUrl;
     }
-    link.href = canonical;
   }
 
   setHome(): void {

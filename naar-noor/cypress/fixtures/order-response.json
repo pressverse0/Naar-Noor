@@ -1,0 +1,7 @@
+{
+  "id": "order-test-12345",
+  "status": "Confirmed",
+  "total": 16.95,
+  "customerName": "Test User",
+  "email": "test@example.com"
+}

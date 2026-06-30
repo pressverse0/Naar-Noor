@@ -1,139 +1,92 @@
 /**
  * OrderPage Page Object
- * Encapsulates UI interactions for order placement workflow
+ * Encapsulates UI interactions for the checkout / order placement workflow.
+ *
+ * The checkout form uses:
+ *   input[name="customerName"]   — customer name
+ *   input[name="email"]          — email
+ *   input[name="phone"]          — phone number
+ *   textarea[name="address"]     — delivery address (only shown for delivery orders)
+ *   select[name="orderType"]     — order type (delivery | pickup | dine-in)
+ *
+ * Submitting calls POST /api/payments/create-checkout-session which returns
+ * { url } and redirects the browser.  Tests stub this endpoint so
+ * verifyOrderConfirmation() checks the URL changed to /payment-success.
  */
 
 export class OrderPage {
-  /**
-   * Navigate to checkout/order page
-   */
   static visit() {
     cy.visit('/checkout');
   }
 
-  /**
-   * Get cart items list
-   */
   static getCartItems() {
     return cy.get('[data-cy="cart-item"]');
   }
 
-  /**
-   * Get item quantity input
-   */
   static getQuantityInput(itemIndex: number) {
     return cy.get('[data-cy="cart-item"]').eq(itemIndex).find('input[type="number"]');
   }
 
-  /**
-   * Get item price
-   */
   static getItemPrice(itemIndex: number) {
     return cy.get('[data-cy="cart-item"]').eq(itemIndex).find('[data-cy="item-price"]');
   }
 
-  /**
-   * Get remove button
-   */
   static getRemoveButton(itemIndex: number) {
     return cy.get('[data-cy="cart-item"]').eq(itemIndex).find('button').contains('Remove');
   }
 
-  /**
-   * Get order total
-   */
   static getOrderTotal() {
     return cy.get('[data-cy="order-total"]');
   }
 
-  /**
-   * Get customer name input
-   */
   static getNameInput() {
     return cy.get('input[name="customerName"]');
   }
 
-  /**
-   * Get email input
-   */
   static getEmailInput() {
     return cy.get('input[name="email"]');
   }
 
-  /**
-   * Get phone input
-   */
   static getPhoneInput() {
     return cy.get('input[name="phone"]');
   }
 
-  /**
-   * Get delivery address input
-   */
   static getAddressInput() {
     return cy.get('textarea[name="address"]');
   }
 
-  /**
-   * Get order type select
-   */
   static getOrderTypeSelect() {
     return cy.get('select[name="orderType"]');
   }
 
-  /**
-   * Get place order button
-   */
+  /** The submit button redirects to Stripe (or the stubbed payment URL). */
   static getPlaceOrderButton() {
-    return cy.get('button').contains('Place Order');
+    return cy.get('button').contains('Pay with Stripe');
   }
 
-  /**
-   * Change item quantity
-   */
   static changeQuantity(itemIndex: number, quantity: number) {
     this.getQuantityInput(itemIndex).clear().type(quantity.toString());
   }
 
-  /**
-   * Remove item from cart
-   */
   static removeItem(itemIndex: number) {
     this.getRemoveButton(itemIndex).click();
   }
 
-  /**
-   * Select order type
-   */
   static selectOrderType(type: 'delivery' | 'pickup' | 'dine-in') {
     this.getOrderTypeSelect().select(type);
   }
 
-  /**
-   * Enter customer details
-   */
   static enterCustomerDetails(name: string, email: string, phone: string) {
     this.getNameInput().type(name);
     this.getEmailInput().type(email);
     this.getPhoneInput().type(phone);
   }
 
-  /**
-   * Enter delivery address
-   */
   static enterDeliveryAddress(address: string) {
     this.getAddressInput().type(address);
   }
 
-  /**
-   * Complete order
-   */
-  static completeOrder(
-    name: string,
-    email: string,
-    phone: string,
-    address?: string
-  ) {
+  static completeOrder(name: string, email: string, phone: string, address?: string) {
     this.enterCustomerDetails(name, email, phone);
     if (address) {
       this.enterDeliveryAddress(address);
@@ -141,37 +94,26 @@ export class OrderPage {
     this.getPlaceOrderButton().click();
   }
 
-  /**
-   * Verify cart item count
-   */
   static verifyCartItemCount(count: number) {
     this.getCartItems().should('have.length', count);
   }
 
-  /**
-   * Verify total matches
-   */
   static verifyTotal(total: string) {
     this.getOrderTotal().should('contain', total);
   }
 
   /**
-   * Verify order confirmation
+   * After a successful Stripe session creation the browser is redirected to
+   * /payment-success (via the stubbed fixture).
    */
   static verifyOrderConfirmation() {
-    cy.get('[data-cy="order-confirmation"]').should('exist');
+    cy.url().should('include', '/payment-success');
   }
 
-  /**
-   * Get order reference number
-   */
   static getOrderReference() {
     return cy.get('[data-cy="order-reference"]');
   }
 
-  /**
-   * Verify error message
-   */
   static verifyErrorMessage(message: string) {
     cy.contains(message).should('be.visible');
   }
