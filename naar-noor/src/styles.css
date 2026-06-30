@@ -22,10 +22,131 @@ body {
 ::-webkit-scrollbar-thumb  { background: #1f1f1f; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #C65A1E; }
 
-/* Date picker */
+/* ── Global form colour-scheme hint ────────────────── */
+input, select, textarea, button {
+  color-scheme: dark;
+}
+
+/* ── Date picker ────────────────────────────────────── */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   opacity: 0.5;
+  cursor: pointer;
+}
+
+/* ── Number inputs: hide browser spinners ───────────── */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ── Search: replace browser clear button ───────────── */
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M1 1l12 12M13 1L1 13' stroke='%23737373' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center;
+  cursor: pointer;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+input[type="search"]::-webkit-search-cancel-button:hover { opacity: 1; }
+
+/* ── Select: force dark option backgrounds ──────────── */
+select option {
+  background-color: #111;
+  color: #fff;
+}
+
+/* ── Checkboxes / radio: brand accent colour ─────────── */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #C65A1E;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ────────────────────────────────────────────────────────
+   SHARED FORM UTILITIES
+   .nn-input  — filter/light-surface inputs (bg-white/5)
+   .nn-field  — card-embedded inputs (bg-[#0a0a0a])
+   ──────────────────────────────────────────────────────── */
+
+/* Filter / panel inputs */
+.nn-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #fff;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nn-input::placeholder { color: rgba(115, 115, 115, 1); }
+.nn-input:focus {
+  border-color: #C65A1E;
+  box-shadow: 0 0 0 3px rgba(198, 90, 30, 0.12);
+}
+
+/* Custom chevron arrow for select.nn-input */
+select.nn-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 7l5 5 5-5' stroke='%23737373' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.125rem;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+/* Card / form-card inputs (sit on dark #111 cards) */
+.nn-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background-color: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #fff;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nn-field::placeholder { color: rgba(82, 82, 82, 1); }
+.nn-field:focus {
+  border-color: #C65A1E;
+  box-shadow: 0 0 0 3px rgba(198, 90, 30, 0.12);
+}
+
+/* Validation error state — works on nn-input and nn-field */
+.nn-field--error {
+  border-color: rgba(239, 68, 68, 0.6) !important;
+}
+.nn-field--error:focus {
+  border-color: rgb(239, 68, 68) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+/* Custom chevron for select.nn-field */
+select.nn-field {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 7l5 5 5-5' stroke='%23737373' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.125rem;
+  padding-right: 2.5rem;
   cursor: pointer;
 }
 
@@ -170,6 +291,32 @@ html.theme-light .skeleton {
 html.theme-light app-animated-background canvas,
 html.theme-light app-animated-background {
   opacity: 0.06 !important;
+}
+
+/* ── nn-input / nn-field in light mode ─────────────── */
+html.theme-light .nn-input {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.14);
+  color: #1a1208;
+}
+html.theme-light .nn-input::placeholder { color: #a0937d; }
+html.theme-light select.nn-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 7l5 5 5-5' stroke='%23a0937d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+}
+html.theme-light .nn-field {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.14);
+  color: #1a1208;
+}
+html.theme-light .nn-field::placeholder { color: #a0937d; }
+
+html.theme-light select option {
+  background-color: #ede6dc;
+  color: #1a1208;
+}
+
+html.theme-light input[type="search"]::-webkit-search-cancel-button {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M1 1l12 12M13 1L1 13' stroke='%23a0937d' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 /* ── Auth modal adjustments for light mode ─────────── */

@@ -32,7 +32,7 @@ import { SeoService } from '../../services/seo.service';
                 data-cy="category-filter"
                 [(ngModel)]="activeCategory"
                 (change)="applyFilters()"
-                class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E]/20 focus:outline-none text-sm"
+                class="nn-input"
               >
                 <option value="All">All</option>
                 <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
@@ -47,7 +47,7 @@ import { SeoService } from '../../services/seo.service';
                 [(ngModel)]="searchQuery"
                 (input)="applyFilters()"
                 placeholder="Search menu..."
-                class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E]/20 focus:outline-none text-sm"
+                class="nn-input"
               />
             </div>
 
@@ -58,7 +58,7 @@ import { SeoService } from '../../services/seo.service';
                 name="sortBy"
                 [(ngModel)]="sortBy"
                 (change)="applyFilters()"
-                class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E]/20 focus:outline-none text-sm"
+                class="nn-input"
               >
                 <option value="newest">Newest First</option>
                 <option value="price-asc">Price: Low to High</option>
@@ -76,7 +76,6 @@ import { SeoService } from '../../services/seo.service';
                   name="vegetarian"
                   [(ngModel)]="dietary.vegetarian"
                   (change)="applyFilters()"
-                  class="rounded border-white/10 text-[#C65A1E] focus:ring-[#C65A1E]"
                 />
                 <span>Vegetarian</span>
               </label>
@@ -86,7 +85,6 @@ import { SeoService } from '../../services/seo.service';
                   name="vegan"
                   [(ngModel)]="dietary.vegan"
                   (change)="applyFilters()"
-                  class="rounded border-white/10 text-[#C65A1E] focus:ring-[#C65A1E]"
                 />
                 <span>Vegan</span>
               </label>
@@ -96,7 +94,6 @@ import { SeoService } from '../../services/seo.service';
                   name="glutenFree"
                   [(ngModel)]="dietary.glutenFree"
                   (change)="applyFilters()"
-                  class="rounded border-white/10 text-[#C65A1E] focus:ring-[#C65A1E]"
                 />
                 <span>Gluten-Free</span>
               </label>
@@ -112,7 +109,7 @@ import { SeoService } from '../../services/seo.service';
                   [(ngModel)]="minPrice"
                   (input)="applyFilters()"
                   placeholder="Min"
-                  class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E]/20 focus:outline-none text-sm"
+                  class="nn-input"
                 />
                 <input
                   type="number"
@@ -120,7 +117,7 @@ import { SeoService } from '../../services/seo.service';
                   [(ngModel)]="maxPrice"
                   (input)="applyFilters()"
                   placeholder="Max"
-                  class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E]/20 focus:outline-none text-sm"
+                  class="nn-input"
                 />
               </div>
             </div>

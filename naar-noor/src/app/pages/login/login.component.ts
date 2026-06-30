@@ -29,7 +29,7 @@ import { SeoService } from '../../services/seo.service';
               type="email"
               formControlName="email"
               placeholder="e.g. demo@example.com"
-              class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-[#C65A1E] focus:outline-none transition-all text-sm"
+              class="nn-input"
             />
             <div *ngIf="f['email'].touched && f['email'].errors" class="text-xs text-red-400">
               <span *ngIf="f['email'].errors['required']">Email is required</span>
@@ -44,7 +44,7 @@ import { SeoService } from '../../services/seo.service';
               type="password"
               formControlName="password"
               placeholder="••••••••"
-              class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-neutral-500 focus:border-[#C65A1E] focus:outline-none transition-all text-sm"
+              class="nn-input"
             />
             <div *ngIf="f['password'].touched && f['password'].errors" class="text-xs text-red-400">
               <span *ngIf="f['password'].errors['required']">Password is required</span>

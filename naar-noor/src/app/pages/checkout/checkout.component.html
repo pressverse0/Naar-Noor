@@ -73,7 +73,7 @@
           <select
             name="orderType"
             formControlName="type"
-            class="w-full px-4 py-3 bg-[#111] border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-[#C65A1E]"
+            class="nn-input"
           >
             <option value="pickup">Takeaway (Pickup)</option>
             <option value="delivery">Delivery</option>
@@ -92,8 +92,8 @@
               formControlName="customerName"
               type="text"
               placeholder="Full name"
-              class="w-full px-4 py-3.5 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors"
-              [ngClass]="err('customerName') ? 'border-red-500/60' : 'border-white/10'"
+              class="nn-input"
+              [ngClass]="err('customerName') ? 'nn-field--error' : ''"
             />
             <p *ngIf="err('customerName')" class="mt-1.5 text-xs text-red-400">
               <span *ngIf="f['customerName'].errors?.['required']">Customer name is required</span>
@@ -107,8 +107,8 @@
               formControlName="email"
               type="email"
               placeholder="Email address"
-              class="w-full px-4 py-3.5 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors"
-              [ngClass]="err('email') ? 'border-red-500/60' : 'border-white/10'"
+              class="nn-input"
+              [ngClass]="err('email') ? 'nn-field--error' : ''"
             />
             <p *ngIf="err('email')" class="mt-1.5 text-xs text-red-400">
               <span *ngIf="f['email'].errors?.['required']">Email is required</span>
@@ -123,8 +123,8 @@
               formControlName="phoneNumber"
               type="tel"
               placeholder="Phone number"
-              class="w-full px-4 py-3.5 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors"
-              [ngClass]="err('phoneNumber') ? 'border-red-500/60' : 'border-white/10'"
+              class="nn-input"
+              [ngClass]="err('phoneNumber') ? 'nn-field--error' : ''"
             />
             <p *ngIf="err('phoneNumber')" class="mt-1.5 text-xs text-red-400">
               <span *ngIf="f['phoneNumber'].errors?.['required']">Phone number is required</span>
@@ -140,8 +140,8 @@
             formControlName="deliveryAddress"
             rows="3"
             placeholder="Enter your full delivery address including postcode"
-            class="w-full px-4 py-3.5 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors resize-none"
-            [ngClass]="err('deliveryAddress') ? 'border-red-500/60' : 'border-white/10'"
+            class="nn-input resize-none"
+            [ngClass]="err('deliveryAddress') ? 'nn-field--error' : ''"
           ></textarea>
           <p *ngIf="err('deliveryAddress')" class="text-xs text-red-400">
             <span *ngIf="f['deliveryAddress'].errors?.['required']">Delivery address is required</span>
@@ -154,7 +154,7 @@
           <input
             data-cy="pickup-time"
             type="time"
-            class="w-full px-4 py-3.5 bg-[#111] border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-[#C65A1E]"
+            class="nn-input"
           />
         </div>
 
@@ -164,7 +164,7 @@
           <select
             data-cy="table-selection"
             formControlName="tableReservationName"
-            class="w-full px-4 py-3.5 bg-[#111] border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-[#C65A1E]"
+            class="nn-input"
           >
             <option value="">Select a table reservation</option>
             <option value="Table 1">Table 1 (Window)</option>
@@ -182,7 +182,7 @@
           </p>
           <textarea formControlName="notes" rows="2"
                     placeholder="Allergies, dietary requirements, etc."
-                    class="w-full px-4 py-3.5 bg-[#111] border border-white/10 rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E]/10 transition-colors resize-none"></textarea>
+                    class="nn-input resize-none"></textarea>
         </div>
 
         <!-- Submit -->

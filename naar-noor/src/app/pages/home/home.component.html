@@ -15,6 +15,12 @@
 }
 
 @defer (on viewport) {
+  <app-reservation></app-reservation>
+} @placeholder {
+  <div class="min-h-[420px] py-12"></div>
+}
+
+@defer (on viewport) {
   <app-chefs></app-chefs>
 } @placeholder {
   <div class="min-h-[640px] py-24"></div>

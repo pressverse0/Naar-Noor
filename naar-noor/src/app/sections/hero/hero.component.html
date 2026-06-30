@@ -59,7 +59,7 @@
           Explore Menu
           <iconify-icon icon="solar:arrow-right-linear" width="18"></iconify-icon>
         </a>
-        <a href="#reserve" class="w-full sm:w-auto px-8 py-3.5 text-sm font-medium text-white border border-white/20 rounded-xl hover:bg-white/5 hover:border-white/40 transition-all duration-300 flex items-center justify-center">
+        <a href="#reservation-full" class="w-full sm:w-auto px-8 py-3.5 text-sm font-medium text-white border border-white/20 rounded-xl hover:bg-white/5 hover:border-white/40 transition-all duration-300 flex items-center justify-center">
           Reserve Table
         </a>
       </div>
@@ -99,69 +99,4 @@
     </div>
   </div>
 
-  <!-- ── Reservation card ── -->
-  <div id="reserve" class="relative z-30 w-full px-4 sm:px-6 md:-mb-[220px]">
-    <div class="max-w-5xl mx-auto bg-[#111] border border-white/5 rounded-2xl shadow-2xl backdrop-blur-xl flex flex-col md:flex-row">
-
-      <div class="p-8 sm:p-10 md:p-12 md:w-2/5 flex flex-col justify-center bg-gradient-to-br from-[#111] to-[#1a1a1a] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
-        <h2 class="font-['Forum'] text-2xl sm:text-3xl md:text-4xl text-white tracking-tight mb-4">Reserve Your Table</h2>
-        <p class="text-sm text-neutral-400 leading-relaxed mb-6">
-          Experience unforgettable flavors in a warm, premium setting. For parties larger than 8, please contact us directly.
-        </p>
-        <div class="flex items-center gap-3 text-sm text-neutral-300">
-          <iconify-icon icon="solar:phone-linear" width="20" class="text-[#C65A1E]"></iconify-icon>
-          +44 (0) 1481 123456
-        </div>
-      </div>
-
-      <div class="p-8 sm:p-10 md:p-12 md:w-3/5 border-t md:border-t-0 md:border-l border-white/5 rounded-b-2xl md:rounded-bl-none md:rounded-r-2xl">
-        <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-
-          <div class="space-y-1.5">
-            <label class="text-xs text-neutral-400 ml-1">Full Name</label>
-            <input type="text" [(ngModel)]="reservation.fullName" name="fullName" placeholder="John Doe"
-              class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E] transition-all">
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-xs text-neutral-400 ml-1">Email Address</label>
-            <input type="email" [(ngModel)]="reservation.email" name="email" placeholder="john@example.com"
-              class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E] transition-all">
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-xs text-neutral-400 ml-1">Phone Number</label>
-            <input type="tel" [(ngModel)]="reservation.phone" name="phone" placeholder="+44..."
-              class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E] transition-all">
-          </div>
-
-          <div class="space-y-1.5 relative z-30">
-            <label class="text-xs text-neutral-400 ml-1">Date</label>
-            <app-custom-calendar [selectedDate]="reservation.date" (dateSelected)="onDateSelected($event)"></app-custom-calendar>
-          </div>
-
-          <div class="space-y-1.5 relative z-20">
-            <label class="text-xs text-neutral-400 ml-1">Time</label>
-            <app-custom-dropdown [options]="timeSlots" [selectedValue]="reservation.time" [placeholder]="'Select time'"
-              [icon]="'solar:clock-circle-linear'" (valueSelected)="onTimeSelected($event)"></app-custom-dropdown>
-          </div>
-
-          <div class="space-y-1.5 relative z-10">
-            <label class="text-xs text-neutral-400 ml-1">Guests</label>
-            <app-custom-dropdown [options]="guestOptions" [selectedValue]="reservation.guests" [placeholder]="'Number of guests'"
-              [icon]="'solar:users-group-rounded-linear'" (valueSelected)="onGuestsSelected($event)"></app-custom-dropdown>
-          </div>
-
-          <button type="submit" [disabled]="submitting"
-            class="sm:col-span-2 mt-1 w-full px-6 py-3.5 text-sm font-medium text-[#0a0a0a] bg-white rounded-xl hover:bg-[#C65A1E] hover:text-white hover:shadow-[0_0_20px_rgba(198,90,30,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-            <span *ngIf="!submitting">Confirm Booking</span>
-            <span *ngIf="submitting" class="flex items-center justify-center gap-2">
-              <span class="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-              Submitting…
-            </span>
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
 </section>

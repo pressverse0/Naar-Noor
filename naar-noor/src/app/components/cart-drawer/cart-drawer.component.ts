@@ -192,10 +192,8 @@ import { DrawerStep } from '../../models';
 
               <div>
                 <input formControlName="customerName" type="text" placeholder="Full name"
-                       class="w-full px-4 py-3 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors"
-                       [ngClass]="err('customerName')
-                         ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/20'
-                         : 'border-white/10 focus:border-[#C65A1E] focus:ring-[#C65A1E]/10'">
+                       class="nn-input"
+                       [ngClass]="err('customerName') ? 'nn-field--error' : ''">
                 <p *ngIf="err('customerName')" class="mt-1.5 text-xs text-red-400 flex items-center gap-1">
                   <iconify-icon icon="solar:danger-circle-linear" width="12"></iconify-icon>
                   <span *ngIf="f['customerName'].errors?.['required']">Your name is required.</span>
@@ -205,10 +203,8 @@ import { DrawerStep } from '../../models';
 
               <div>
                 <input formControlName="email" type="email" placeholder="Email address"
-                       class="w-full px-4 py-3 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors"
-                       [ngClass]="err('email')
-                         ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/20'
-                         : 'border-white/10 focus:border-[#C65A1E] focus:ring-[#C65A1E]/10'">
+                       class="nn-input"
+                       [ngClass]="err('email') ? 'nn-field--error' : ''">
                 <p *ngIf="err('email')" class="mt-1.5 text-xs text-red-400 flex items-center gap-1">
                   <iconify-icon icon="solar:danger-circle-linear" width="12"></iconify-icon>
                   <span *ngIf="f['email'].errors?.['required']">Email is required.</span>
@@ -218,10 +214,8 @@ import { DrawerStep } from '../../models';
 
               <div>
                 <input formControlName="phoneNumber" type="tel" placeholder="Phone number"
-                       class="w-full px-4 py-3 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors"
-                       [ngClass]="err('phoneNumber')
-                         ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/20'
-                         : 'border-white/10 focus:border-[#C65A1E] focus:ring-[#C65A1E]/10'">
+                       class="nn-input"
+                       [ngClass]="err('phoneNumber') ? 'nn-field--error' : ''">
                 <p *ngIf="err('phoneNumber')" class="mt-1.5 text-xs text-red-400 flex items-center gap-1">
                   <iconify-icon icon="solar:danger-circle-linear" width="12"></iconify-icon>
                   <span *ngIf="f['phoneNumber'].errors?.['required']">Phone number is required.</span>
@@ -235,10 +229,8 @@ import { DrawerStep } from '../../models';
               <p class="text-xs text-neutral-500 tracking-[0.15em] uppercase">Delivery address</p>
               <textarea formControlName="deliveryAddress" rows="3"
                         placeholder="Full delivery address including postcode"
-                        class="w-full px-4 py-3 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors resize-none"
-                        [ngClass]="err('deliveryAddress')
-                          ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/20'
-                          : 'border-white/10 focus:border-[#C65A1E] focus:ring-[#C65A1E]/10'"></textarea>
+                        class="nn-input resize-none"
+                        [ngClass]="err('deliveryAddress') ? 'nn-field--error' : ''"></textarea>
               <p *ngIf="err('deliveryAddress')" class="text-xs text-red-400 flex items-center gap-1">
                 <iconify-icon icon="solar:danger-circle-linear" width="12"></iconify-icon>
                 Please enter your full delivery address.
@@ -256,10 +248,8 @@ import { DrawerStep } from '../../models';
               </div>
               <input formControlName="tableReservationName" type="text"
                      placeholder="Reservation name (e.g. John Smith)"
-                     class="w-full px-4 py-3 bg-[#111] border rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-1 transition-colors"
-                     [ngClass]="err('tableReservationName')
-                       ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/20'
-                       : 'border-white/10 focus:border-[#C65A1E] focus:ring-[#C65A1E]/10'">
+                     class="nn-input"
+                     [ngClass]="err('tableReservationName') ? 'nn-field--error' : ''">
               <p *ngIf="err('tableReservationName')" class="text-xs text-red-400 flex items-center gap-1">
                 <iconify-icon icon="solar:danger-circle-linear" width="12"></iconify-icon>
                 Please enter the name your reservation is under.
@@ -273,7 +263,7 @@ import { DrawerStep } from '../../models';
               </p>
               <textarea formControlName="notes" rows="2"
                         placeholder="Allergies, dietary requirements, etc."
-                        class="w-full px-4 py-3 bg-[#111] border border-white/10 rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-[#C65A1E] focus:ring-1 focus:ring-[#C65A1E]/10 transition-colors resize-none">
+                        class="nn-input resize-none">
               </textarea>
             </div>
 
