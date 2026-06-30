@@ -133,7 +133,7 @@ public class CreateOrderCommandHandlerTests : IAsyncLifetime
             Email: "notes@test.com",
             PhoneNumber: "07700000002",
             Type: "collection",
-            Items: new List<CreateOrderItemDto> { new(Guid.NewGuid(), "Item", 5m, 1) },
+            Items: new List<OrderItemRequest> { new(Guid.NewGuid(), "Item", 5m, 1) },
             Notes: "Extra spicy please",
             DeliveryAddress: null,
             TableReservationName: null
@@ -153,7 +153,7 @@ public class CreateOrderCommandHandlerTests : IAsyncLifetime
             Email: "delivery@test.com",
             PhoneNumber: "07700000003",
             Type: "delivery",
-            Items: new List<CreateOrderItemDto> { new(Guid.NewGuid(), "Item", 5m, 1) },
+            Items: new List<OrderItemRequest> { new(Guid.NewGuid(), "Item", 5m, 1) },
             Notes: null,
             DeliveryAddress: "123 Test Street, London",
             TableReservationName: null

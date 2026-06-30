@@ -202,4 +202,83 @@ public class StripeServiceTests
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", prevEnv);
         }
     }
+
+    private static string BuildCheckoutSessionEvent(string orderId, string sessionId = "cs_test_session_abc") => $$"""
+        {
+          "id": "evt_test_checkout_001",
+          "object": "event",
+          "type": "checkout.session.completed",
+          "api_version": "{{CurrentStripeApiVersion}}",
+          "created": 1234567890,
+          "livemode": false,
+          "pending_webhooks": 0,
+          "request": null,
+          "data": {
+            "object": {
+              "id": "{{sessionId}}",
+              "object": "checkout.session",
+              "payment_intent": "pi_test_xyz",
+              "amount_total": 2000,
+              "currency": "gbp",
+              "customer_email": "test@example.com",
+              "mode": "payment",
+              "payment_status": "paid",
+              "status": "complete",
+              "success_url": "https://example.com/success",
+              "cancel_url": "https://example.com/cancel",
+              "metadata": {
+                "orderId": "{{orderId}}",
+                "customerName": "Test Customer"
+              }
+            }
+          }
+        }
+        """;
+
+    [Fact]
+    public async Task ParseWebhookEventAsync_CheckoutSessionCompleted_ReturnsSessionIdAndOrderId()
+    {
+        var prevEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        try
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            var service = CreateService(webhookSecret: "");
+            var expectedOrderId = Guid.NewGuid().ToString();
+
+            var result = await service.ParseWebhookEventAsync(
+                BuildCheckoutSessionEvent(expectedOrderId),
+                "no-sig",
+                CancellationToken.None);
+
+            result.EventType.Should().Be("checkout.session.completed");
+            result.SessionId.Should().Be("cs_test_session_abc", "Session events should return the session ID");
+            result.OrderId.Should().Be(expectedOrderId, "Order ID should be extracted from session metadata");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", prevEnv);
+        }
+    }
+
+    [Fact]
+    public async Task ParseWebhookEventAsync_CheckoutSessionCompleted_ReturnsPaymentIntentId()
+    {
+        var prevEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        try
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            var service = CreateService(webhookSecret: "");
+
+            var result = await service.ParseWebhookEventAsync(
+                BuildCheckoutSessionEvent(Guid.NewGuid().ToString()),
+                "no-sig",
+                CancellationToken.None);
+
+            result.PaymentIntentId.Should().Be("pi_test_xyz", "Payment intent ID should be extracted from session");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", prevEnv);
+        }
+    }
 }

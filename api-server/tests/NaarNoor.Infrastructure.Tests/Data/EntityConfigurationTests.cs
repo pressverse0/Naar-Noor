@@ -233,7 +233,7 @@ public class EntityConfigurationTests
 
         var entityType = ctx.Model.FindEntityType(typeof(Chef));
         entityType.Should().NotBeNull();
-        entityType!.GetPrimaryKey().Should().NotBeNull();
+        entityType!.FindPrimaryKey().Should().NotBeNull();
     }
 
     [Fact]
@@ -252,7 +252,7 @@ public class EntityConfigurationTests
         {
             var entity = model.FindEntityType(type);
             entity.Should().NotBeNull($"{type.Name} should be in the model");
-            entity!.GetPrimaryKey().Should().NotBeNull($"{type.Name} should have a primary key");
+            entity!.FindPrimaryKey().Should().NotBeNull($"{type.Name} should have a primary key");
         }
     }
 

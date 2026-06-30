@@ -63,11 +63,13 @@ public class ApplicationDependencyInjectionTests
     [Fact]
     public void AddApplication_RegistersValidationBehaviourPipeline()
     {
-        using var provider = BuildProvider();
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddApplication();
 
-        var behaviors = provider.GetServices(typeof(IPipelineBehavior<,>));
+        var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IPipelineBehavior<,>));
 
-        behaviors.Should().NotBeNull();
+        descriptor.Should().NotBeNull("ValidationBehaviour pipeline should be registered as open generic IPipelineBehavior<,>");
     }
 
     [Fact]
