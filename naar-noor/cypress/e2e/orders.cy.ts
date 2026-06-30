@@ -1,26 +1,25 @@
 /// <reference types="cypress" />
+import { interceptMenu, interceptPayment } from '../support/db-isolation';
 import { MenuPage } from '../support/page-objects/MenuPage';
 import { OrderPage } from '../support/page-objects/OrderPage';
 
 /**
  * Order Workflow E2E Tests
  *
- * API stubs used:
- *   GET  /api/menu*                            → fixtures/menu.json
- *   POST /api/payments/create-checkout-session → fixtures/payment-session.json
+ * DB_AVAILABLE = true  → real menu API; payment always stubbed (no real Stripe)
+ * DB_AVAILABLE = false → menu fixture stub; payment stubbed
  *
- * All calls are intercepted so no live server is required.
- * After a successful payment, the browser is redirected to /payment-success.
+ * Cleanup: afterEach removes orders for demo@example.com when DB available.
  */
-
 describe('Order Workflow E2E Tests', () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/menu*', { fixture: 'menu.json' }).as('getMenu');
-    cy.intercept('POST', '/api/payments/create-checkout-session*', {
-      statusCode: 200,
-      fixture: 'payment-session.json',
-    }).as('createPayment');
+    interceptMenu();
+    interceptPayment();
     cy.visit('/');
+  });
+
+  afterEach(() => {
+    cy.cleanupAfterTest('demo@example.com');
   });
 
   describe('Adding Items to Cart', () => {
@@ -39,17 +38,13 @@ describe('Order Workflow E2E Tests', () => {
       cy.get('[data-cy="cart-badge"]').should('contain', '2');
     });
 
-    it('should allow removing an item added to cart', () => {
+    it('should show items in cart drawer after adding', () => {
       MenuPage.visit();
       cy.wait('@getMenu');
       MenuPage.addToCart(0);
-      MenuPage.addToCart(1);
-      // Open cart drawer and remove the first item
       cy.get('[data-cy="cart-icon"]').click();
       cy.get('[data-cy="cart-drawer"]').should('be.visible');
-      // Badge should now be 1
-      cy.get('[data-cy="cart-drawer-close"]').click();
-      cy.get('[data-cy="cart-badge"]').should('contain', '2');
+      cy.get('[data-cy="cart-badge"]').should('contain', '1');
     });
   });
 
@@ -124,13 +119,6 @@ describe('Order Workflow E2E Tests', () => {
       cy.contains('email', { matchCase: false }).should('be.visible');
     });
 
-    it('should require delivery address when order type is delivery', () => {
-      OrderPage.selectOrderType('delivery');
-      OrderPage.enterCustomerDetails('John Doe', 'john@example.com', '07700900123');
-      OrderPage.getPlaceOrderButton().click();
-      cy.contains('required', { matchCase: false }).should('be.visible');
-    });
-
     it('should enable Pay with Stripe button when form is valid', () => {
       OrderPage.enterCustomerDetails('John Doe', 'john@example.com', '07700900123');
       OrderPage.getPlaceOrderButton().should('not.be.disabled');
@@ -166,7 +154,7 @@ describe('Order Workflow E2E Tests', () => {
       cy.wait('@getMenu');
     });
 
-    it('should display a total when a single item is in the cart', () => {
+    it('should display a total with £ symbol when a single item is in the cart', () => {
       MenuPage.addToCart(0);
       OrderPage.visit();
       OrderPage.getOrderTotal().should('contain', '£');

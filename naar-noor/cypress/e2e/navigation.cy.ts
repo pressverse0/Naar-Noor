@@ -1,8 +1,15 @@
 /// <reference types="cypress" />
+import { interceptMenu } from '../support/db-isolation';
 
+/**
+ * Navigation E2E Tests
+ *
+ * DB_AVAILABLE = true  → real menu API (passthrough intercept)
+ * DB_AVAILABLE = false → fixture stub (menu.json)
+ */
 describe('Navigation E2E Tests', () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/menu*', { fixture: 'menu.json' }).as('getMenu');
+    interceptMenu();
     cy.visit('/');
   });
 
@@ -75,15 +82,12 @@ describe('Navigation E2E Tests', () => {
     });
 
     it('hides cart badge when cart is empty, shows it after adding an item', () => {
-      // Badge must NOT exist when cart is empty
       cy.get('[data-cy="cart-badge"]').should('not.exist');
 
-      // Add one item via the menu page
       cy.visit('/menu');
       cy.wait('@getMenu');
       cy.get('[data-cy="menu-item"]').first().find('button').contains('Add').click();
 
-      // Badge is now visible with count 1
       cy.get('[data-cy="cart-badge"]').should('exist').and('contain', '1');
     });
 

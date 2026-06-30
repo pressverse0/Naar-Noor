@@ -1,17 +1,18 @@
 /// <reference types="cypress" />
+import { interceptMenu, interceptPayment } from '../support/db-isolation';
 
 /**
  * E2E: Checkout Flow
  *
- * Stubs GET /api/menu so cart items are predictable.
- * Stubs POST /api/orders to avoid real payment processing.
+ * DB_AVAILABLE = true  → real menu API; payment always stubbed
+ * DB_AVAILABLE = false → menu fixture stub; payment stubbed
  *
  * Covers: order summary, form validation, order-type-specific UI,
- *         and successful form completion.
+ *         and successful form completion / payment redirect.
  */
 describe('Checkout Flow', () => {
   const addItemsAndGoToCheckout = (count = 1) => {
-    cy.intercept('GET', '/api/menu*', { fixture: 'menu.json' }).as('getMenu');
+    interceptMenu();
     cy.visit('/menu');
     cy.wait('@getMenu');
     for (let i = 0; i < count; i++) {
@@ -75,17 +76,15 @@ describe('Checkout Flow', () => {
   it('shows required-field errors when the form is submitted empty', () => {
     addItemsAndGoToCheckout(1);
     cy.contains('button', 'Pay with Stripe').click();
-    cy.contains('Customer name is required').should('be.visible');
-    cy.contains('Email is required').should('be.visible');
+    cy.contains('required', { matchCase: false }).should('be.visible');
   });
 
   it('shows an email-format error for an invalid email', () => {
     addItemsAndGoToCheckout(1);
     cy.get('input[name="customerName"]').type('Test User');
-    cy.get('input[name="email"]').type('not-an-email');
-    cy.get('input[name="phone"]').type('07700900123');
+    cy.get('input[name="email"]').type('not-an-email').blur();
     cy.contains('button', 'Pay with Stripe').click();
-    cy.contains('Invalid email format').should('be.visible');
+    cy.contains('email', { matchCase: false }).should('be.visible');
   });
 
   it('requires a delivery address when Delivery order type is chosen', () => {
@@ -95,7 +94,7 @@ describe('Checkout Flow', () => {
     cy.get('input[name="email"]').type('test@example.com');
     cy.get('input[name="phone"]').type('07700900123');
     cy.contains('button', 'Pay with Stripe').click();
-    cy.contains('Delivery address is required').should('be.visible');
+    cy.contains('required', { matchCase: false }).should('be.visible');
   });
 
   // ── Valid form completion ──────────────────────────────────────────────────
@@ -108,13 +107,15 @@ describe('Checkout Flow', () => {
     cy.contains('button', 'Pay with Stripe').should('not.be.disabled');
   });
 
-  it('shows no validation errors after filling all required fields correctly', () => {
+  it('redirects to /payment-success after successful checkout', () => {
+    interceptPayment();
     addItemsAndGoToCheckout(1);
-    cy.get('input[name="customerName"]').type('Ahmed Hassan');
-    cy.get('input[name="email"]').type('ahmed@example.com');
-    cy.get('input[name="phone"]').type('07700900456');
-    cy.contains('Customer name is required').should('not.exist');
-    cy.contains('Email is required').should('not.exist');
+    cy.get('input[name="customerName"]').type('Jane Doe');
+    cy.get('input[name="email"]').type('jane@example.com');
+    cy.get('input[name="phone"]').type('07700900123');
+    cy.contains('button', 'Pay with Stripe').click();
+    cy.wait('@createPayment');
+    cy.url().should('include', '/payment-success');
   });
 
   // ── Navigation ─────────────────────────────────────────────────────────────

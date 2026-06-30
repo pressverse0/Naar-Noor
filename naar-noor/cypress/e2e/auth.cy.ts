@@ -1,16 +1,16 @@
 /// <reference types="cypress" />
+import { interceptAuth, interceptLogout } from '../support/db-isolation';
 import { LoginPage } from '../support/page-objects/LoginPage';
 
 /**
  * Authentication E2E Tests
  *
- * API stubs:
- *   POST /api/auth/login  → 200 with fixtures/auth-login.json  (happy path)
- *                        → 401                                 (invalid-credentials path)
- *   POST /api/auth/logout → 200
+ * Auth is ALWAYS stubbed — never hits real Supabase credentials.
+ * interceptAuth() and interceptLogout() are thin wrappers around cy.intercept()
+ * for clarity, consistent with the dual-mode pattern used everywhere else.
  *
- * Logged-in state is detected via [data-user-menu] in the header
- * (added when auth.service.ts sets isLoggedIn = true).
+ * Logged-in state: [data-user-menu] exists in the header.
+ * Logged-out state: [data-user-menu] does not exist.
  */
 
 const VALID_EMAIL    = 'demo@example.com';
@@ -19,10 +19,7 @@ const VALID_PASSWORD = 'password123';
 describe('Authentication E2E Tests', () => {
   describe('Login Workflow', () => {
     beforeEach(() => {
-      cy.intercept('POST', '/api/auth/login*', {
-        statusCode: 200,
-        fixture: 'auth-login.json',
-      }).as('login');
+      interceptAuth('success');
       LoginPage.visit();
     });
 
@@ -46,10 +43,7 @@ describe('Authentication E2E Tests', () => {
     });
 
     it('should reject invalid credentials', () => {
-      cy.intercept('POST', '/api/auth/login*', {
-        statusCode: 401,
-        body: { message: 'Invalid credentials' },
-      }).as('loginFail');
+      interceptAuth('failure', 'loginFail');
       LoginPage.login('wrong@example.com', 'wrongpassword');
       cy.wait('@loginFail');
       LoginPage.verifyErrorMessage('Invalid credentials');
@@ -75,8 +69,8 @@ describe('Authentication E2E Tests', () => {
 
   describe('Logout Workflow', () => {
     beforeEach(() => {
-      cy.intercept('POST', '/api/auth/login*', { statusCode: 200, fixture: 'auth-login.json' }).as('login');
-      cy.intercept('POST', '/api/auth/logout*', { statusCode: 200, body: {} }).as('logout');
+      interceptAuth('success');
+      interceptLogout();
       LoginPage.visit();
       LoginPage.login(VALID_EMAIL, VALID_PASSWORD);
       cy.wait('@login');
@@ -88,7 +82,7 @@ describe('Authentication E2E Tests', () => {
       LoginPage.verifyLoggedOut();
     });
 
-    it('should navigate away from the user-menu area after logout', () => {
+    it('should hide the user-menu after logout', () => {
       LoginPage.clickLogout();
       cy.get('[data-user-menu]').should('not.exist');
     });
@@ -96,7 +90,7 @@ describe('Authentication E2E Tests', () => {
 
   describe('Session Management', () => {
     beforeEach(() => {
-      cy.intercept('POST', '/api/auth/login*', { statusCode: 200, fixture: 'auth-login.json' }).as('login');
+      interceptAuth('success');
     });
 
     it('should persist session on page refresh', () => {
@@ -112,13 +106,13 @@ describe('Authentication E2E Tests', () => {
       LoginPage.visit();
       LoginPage.login(VALID_EMAIL, VALID_PASSWORD);
       cy.wait('@login');
-      cy.intercept('GET', '/api/menu*', { fixture: 'menu.json' });
+      cy.intercept('GET', '/api/menu*').as('getMenuNav');
       cy.visit('/menu');
       LoginPage.verifyLoggedIn();
     });
 
     it('should clear session data after logout', () => {
-      cy.intercept('POST', '/api/auth/logout*', { statusCode: 200, body: {} }).as('logout');
+      interceptLogout();
       LoginPage.visit();
       LoginPage.login(VALID_EMAIL, VALID_PASSWORD);
       cy.wait('@login');

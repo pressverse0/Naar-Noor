@@ -1,26 +1,22 @@
 /// <reference types="cypress" />
+import { interceptChefs, interceptReservationCreate } from '../support/db-isolation';
 import { ReservationPage } from '../support/page-objects/ReservationPage';
 
 /**
  * Reservation Workflow E2E Tests
  *
- * API stubs:
- *   GET  /api/chefs*         → fixtures/chefs.json
- *   POST /api/reservations*  → fixtures/reservation.json (201)
+ * DB_AVAILABLE = true  → passthrough intercepts; real chefs & reservations API
+ * DB_AVAILABLE = false → fixture stubs (chefs.json / reservation.json)
  *
- * Auth:
- *   Unauthenticated tests  — cy.visit('/reservations')
- *   Authenticated tests    — cy.visitAuthenticated('/reservations')
- *     The custom command injects a fake nn_session into localStorage before
- *     Angular boots, so auth.service.ts sees isLoggedIn = true immediately.
- *
- * Form selectors — Angular Reactive Forms do NOT add a native `name` attr.
- *   Use ReservationPage page-object helpers which select by formControlName.
+ * Cleanup: afterEach removes reservations created for demo@example.com.
  */
-
 describe('Reservation Workflow E2E Tests', () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/chefs*', { fixture: 'chefs.json' }).as('getChefs');
+    interceptChefs();
+  });
+
+  afterEach(() => {
+    cy.cleanupAfterTest('demo@example.com');
   });
 
   // ── Unauthenticated ──────────────────────────────────────────────────────────
@@ -72,7 +68,8 @@ describe('Reservation Workflow E2E Tests', () => {
 
     it('should highlight the selected chef card', () => {
       cy.get('[data-cy="chef-card"]').first().click();
-      cy.get('[data-cy="chef-card"]').first().should('have.class', /selected|active|highlight/);
+      cy.get('[data-cy="chef-card"]').first()
+        .should('have.class', 'border-[#C65A1E]');
     });
 
     it('should switch selection when clicking a different chef', () => {
@@ -85,10 +82,7 @@ describe('Reservation Workflow E2E Tests', () => {
   // ── Authenticated — Booking Form ─────────────────────────────────────────────
   describe('Authenticated — booking form', () => {
     beforeEach(() => {
-      cy.intercept('POST', '/api/reservations*', {
-        statusCode: 201,
-        fixture: 'reservation.json',
-      }).as('createReservation');
+      interceptReservationCreate();
       cy.visitAuthenticated('/reservations');
       cy.wait('@getChefs');
       cy.get('[data-cy="chef-card"]').first().click();
