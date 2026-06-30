@@ -1,10 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { HeroComponent } from '../../sections/hero/hero.component';
-import { AboutComponent } from '../../sections/about/about.component';
 import { CategoryComponent } from '../../sections/category/category.component';
 import { MenuComponent } from '../../sections/menu/menu.component';
 import { CinematicBannerComponent } from '../../sections/cinematic-banner/cinematic-banner.component';
-import { ChefsComponent } from '../../sections/chefs/chefs.component';
 import { ReviewsComponent } from '../../sections/reviews/reviews.component';
 import { SeoService } from '../../services/seo.service';
 
@@ -13,11 +11,9 @@ import { SeoService } from '../../services/seo.service';
   standalone: true,
   imports: [
     HeroComponent,
-    AboutComponent,
     CategoryComponent,
     MenuComponent,
     CinematicBannerComponent,
-    ChefsComponent,
     ReviewsComponent,
   ],
   templateUrl: './home.component.html',

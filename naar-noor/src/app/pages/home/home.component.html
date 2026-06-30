@@ -1,5 +1,4 @@
 <app-hero></app-hero>
-<app-about></app-about>
 <app-category></app-category>
 
 @defer (on idle) {
@@ -12,12 +11,6 @@
   <app-cinematic-banner></app-cinematic-banner>
 } @placeholder {
   <div class="min-h-[300px]"></div>
-}
-
-@defer (on viewport) {
-  <app-chefs></app-chefs>
-} @placeholder {
-  <div class="min-h-[640px] py-24"></div>
 }
 
 @defer (on viewport) {

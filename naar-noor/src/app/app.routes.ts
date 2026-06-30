@@ -47,6 +47,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/payment-cancelled/payment-cancelled.component').then(m => m.PaymentCancelledComponent)
   },
   {
+    path: 'privacy',
+    loadComponent: () => import('./pages/privacy/privacy.component').then(m => m.PrivacyPageComponent)
+  },
+  {
+    path: 'terms',
+    loadComponent: () => import('./pages/terms/terms.component').then(m => m.TermsPageComponent)
+  },
+  {
     path: '**',
     loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundComponent)
   }
